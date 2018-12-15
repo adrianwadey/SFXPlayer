@@ -239,9 +239,9 @@ namespace SFXPlayer {
             }
             if (PlayerState == PlayerState.loaded) {
                 PlayFromStart();
-                if (bnStopAll.Checked) {
-                    StopAll(this, new EventArgs());
-                }
+            }
+            if (bnStopAll.Checked) {
+                StopAll(this, new EventArgs());
             }
         }
 

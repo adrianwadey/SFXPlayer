@@ -68,7 +68,7 @@
             this.CueList.Location = new System.Drawing.Point(305, 27);
             this.CueList.Name = "CueList";
             this.CueList.Size = new System.Drawing.Size(482, 401);
-            this.CueList.TabIndex = 13;
+            this.CueList.TabIndex = 4;
             this.CueList.Scroll += new System.Windows.Forms.ScrollEventHandler(this.CueList_Scroll);
             this.CueList.ClientSizeChanged += new System.EventHandler(this.CueList_ClientSizeChanged);
             // 
@@ -82,16 +82,16 @@
             this.comboBox1.Location = new System.Drawing.Point(12, 127);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(183, 21);
-            this.comboBox1.TabIndex = 14;
+            this.comboBox1.TabIndex = 9;
             // 
             // rtMainText
             // 
-            this.rtMainText.AcceptsTab = true;
             this.rtMainText.Location = new System.Drawing.Point(12, 244);
             this.rtMainText.Name = "rtMainText";
             this.rtMainText.Size = new System.Drawing.Size(287, 178);
-            this.rtMainText.TabIndex = 15;
+            this.rtMainText.TabIndex = 2;
             this.rtMainText.Text = "";
+            this.rtMainText.TextChanged += new System.EventHandler(this.rtMainText_TextChanged);
             // 
             // comboBox2
             // 
@@ -99,7 +99,7 @@
             this.comboBox2.Location = new System.Drawing.Point(12, 172);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(183, 21);
-            this.comboBox2.TabIndex = 16;
+            this.comboBox2.TabIndex = 8;
             // 
             // button1
             // 
@@ -118,7 +118,7 @@
             this.button2.Location = new System.Drawing.Point(12, 27);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 18;
+            this.button2.TabIndex = 1;
             this.button2.Text = "Preload";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
@@ -132,7 +132,7 @@
             this.bnPlayNext.Location = new System.Drawing.Point(256, 172);
             this.bnPlayNext.Name = "bnPlayNext";
             this.bnPlayNext.Size = new System.Drawing.Size(48, 21);
-            this.bnPlayNext.TabIndex = 20;
+            this.bnPlayNext.TabIndex = 3;
             this.bnPlayNext.Text = "&Play >";
             this.bnPlayNext.UseVisualStyleBackColor = true;
             this.bnPlayNext.Click += new System.EventHandler(this.bnPlayNext_Click);
@@ -142,7 +142,7 @@
             this.bnAddCue.Location = new System.Drawing.Point(232, 174);
             this.bnAddCue.Name = "bnAddCue";
             this.bnAddCue.Size = new System.Drawing.Size(18, 19);
-            this.bnAddCue.TabIndex = 21;
+            this.bnAddCue.TabIndex = 6;
             this.bnAddCue.Text = "+";
             this.toolTip1.SetToolTip(this.bnAddCue, "Add Cue");
             this.bnAddCue.UseVisualStyleBackColor = true;
@@ -153,7 +153,7 @@
             this.bnDeleteCue.Location = new System.Drawing.Point(215, 174);
             this.bnDeleteCue.Name = "bnDeleteCue";
             this.bnDeleteCue.Size = new System.Drawing.Size(18, 19);
-            this.bnDeleteCue.TabIndex = 22;
+            this.bnDeleteCue.TabIndex = 7;
             this.bnDeleteCue.Text = "-";
             this.toolTip1.SetToolTip(this.bnDeleteCue, "Delete Cue");
             this.bnDeleteCue.UseVisualStyleBackColor = true;
@@ -166,7 +166,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(800, 24);
-            this.menuStrip1.TabIndex = 23;
+            this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem

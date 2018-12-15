@@ -85,6 +85,12 @@ namespace SFXPlayer {
         int paddedTop = 0;
         int cuelistFormSpacing = 0;
 
+        public PlayStrip NextPlayCue {
+            get {
+                return ((PlayStrip)CueList.Controls[paddedTop + NextPlayCueIndex]);
+            }
+        }
+
         public int NextPlayCueIndex {
             get {
                 return CueList.VerticalScroll.Value / cueListSpacing;
@@ -94,7 +100,12 @@ namespace SFXPlayer {
                 NewValue = Math.Min(NewValue, CueList.VerticalScroll.Maximum);
                 CueList.VerticalScroll.Value = NewValue;
                 CueList.VerticalScroll.Value = NewValue;        //update only seems to work when called twice.
+                NextPlayCueChanged();
             }
+        }
+
+        private void NextPlayCueChanged() {
+            rtMainText.Text = NextPlayCue.SFX.MainText;
         }
 
         private void Form1_Load(object sender, EventArgs e) {
@@ -180,6 +191,7 @@ namespace SFXPlayer {
             }
             paddedTop = paddedBottom = 0;
             PadCueList();
+            NextPlayCueChanged();
         }
 
         private void StopAll(object sender, EventArgs e) {
@@ -265,7 +277,8 @@ namespace SFXPlayer {
                 e.NewValue = ((e.NewValue /*+ cueListSpacing / 2*/) / cueListSpacing) * cueListSpacing;
             }
             CueList.VerticalScroll.Value = Math.Min(CueList.VerticalScroll.Maximum, e.NewValue);
-            ReportStatus("Scrolled to " + e.NewValue.ToString("D"));
+            NextPlayCueChanged();
+            //ReportStatus("Scrolled to " + e.NewValue.ToString("D"));
         }
 
         private void button1_Click(object sender, EventArgs e) {
@@ -285,9 +298,8 @@ namespace SFXPlayer {
         }
 
         private void bnPlayNext_Click(object sender, EventArgs e) {
-            int cue = NextPlayCueIndex;
-            ((PlayStrip)CueList.Controls[paddedTop + cue]).Play();
-            NextPlayCueIndex = cue + 1;
+            NextPlayCue.Play();
+            NextPlayCueIndex += 1;
         }
 
         private void bnAddCue_Click(object sender, EventArgs e) {
@@ -298,6 +310,7 @@ namespace SFXPlayer {
             CueList.Controls.SetChildIndex(ps, paddedTop + CurrentShow.Cues.IndexOf(sfx));
             //CueList.Refresh();
             PadCueList();
+            NextPlayCueChanged();
         }
 
         private void bnDeleteCue_Click(object sender, EventArgs e) {
@@ -305,12 +318,14 @@ namespace SFXPlayer {
             if (CurrentShow.DeleteCue(NextPlayCueIndex) == DialogResult.Yes) {
                 CueList.Controls.RemoveAt(NextPlayCueIndex + paddedTop);
                 PadCueList();
+                NextPlayCueChanged();
             }
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e) {
             if (FileHandler.CheckSave(CurrentShow) != DialogResult.OK) return;
             FileNew();
+            NextPlayCueChanged();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
@@ -336,6 +351,7 @@ namespace SFXPlayer {
         private void ScrollTimer_Tick(object sender, EventArgs e) {
             ScrollTimer.Enabled = false;
             CueList.VerticalScroll.Value = CueList.VerticalScroll.Value / cueListSpacing * cueListSpacing;
+            NextPlayCueChanged();
         }
 
         private void Form1_Resize(object sender, EventArgs e) {
@@ -354,6 +370,10 @@ namespace SFXPlayer {
             foreach (PlayStrip playStrip in CueList.Controls) {
                 playStrip.Width = CueList.ClientSize.Width;
             }
+        }
+
+        private void rtMainText_TextChanged(object sender, EventArgs e) {
+            NextPlayCue.SFX.MainText = rtMainText.Text;
         }
     }
 }
