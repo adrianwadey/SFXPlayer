@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace SFXPlayer {
     [Serializable]
@@ -13,12 +14,13 @@ namespace SFXPlayer {
         public string Description;
         public string FileName;
         [DefaultValue(false)]
-        public bool Loop;
+        public bool StopOthers;
 
         public string ShortFileName {
             get {
                 return Path.GetFileNameWithoutExtension(FileName);
             }
         }
+
     }
 }

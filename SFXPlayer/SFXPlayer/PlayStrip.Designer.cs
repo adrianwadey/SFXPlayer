@@ -102,10 +102,11 @@
             // 
             // bnStopAll
             // 
-            this.bnStopAll.AutoSize = true;
-            this.bnStopAll.Location = new System.Drawing.Point(422, 3);
+            this.bnStopAll.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.bnStopAll.Location = new System.Drawing.Point(425, 6);
+            this.bnStopAll.Margin = new System.Windows.Forms.Padding(6);
             this.bnStopAll.Name = "bnStopAll";
-            this.bnStopAll.Size = new System.Drawing.Size(15, 14);
+            this.bnStopAll.Size = new System.Drawing.Size(14, 15);
             this.bnStopAll.TabIndex = 4;
             this.toolTip1.SetToolTip(this.bnStopAll, "Stop All Other Sounds");
             this.bnStopAll.UseVisualStyleBackColor = true;
@@ -121,6 +122,7 @@
             this.Name = "PlayStrip";
             this.Size = new System.Drawing.Size(445, 27);
             this.Load += new System.EventHandler(this.PlayStrip_Load);
+            this.Resize += new System.EventHandler(this.PlayStrip_Resize);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);

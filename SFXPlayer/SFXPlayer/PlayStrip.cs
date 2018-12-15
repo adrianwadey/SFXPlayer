@@ -79,7 +79,7 @@ namespace SFXPlayer {
         //WAVSounds ws;
         //private SoundPlayer player;
         private bool _Placeholder;
-        public bool Placeholder {
+        public bool isPlaceholder {
             get {
                 return _Placeholder;
             }
@@ -97,6 +97,10 @@ namespace SFXPlayer {
         }
 
         private void UpdatePlayerState(PlayerState newstate) {
+            if (isPlaceholder) {
+                BackColor = SystemColors.ControlDark;
+                return;
+            }
             switch (newstate) {
                 case PlayerState.uninitialised:
                     BackColor = Settings.Default.ColourPlayerIdle;
@@ -138,25 +142,30 @@ namespace SFXPlayer {
             set {
                 _SFX = value;
                 tbDescription.Text = SFX.Description;
-                bnStopAll.Checked = SFX.Loop;
+                bnStopAll.Checked = SFX.StopOthers;
             }
         }
 
         public bool IsPlaying => (PlayerState == PlayerState.play);
 
         private void tbDescription_TextChanged(object sender, EventArgs e) {
+            if (isPlaceholder) return;
             SFX.Description = tbDescription.Text;
         }
 
         private void cbLoop_CheckedChanged(object sender, EventArgs e) {
-            SFX.Loop = bnStopAll.Checked;
+            if (isPlaceholder) return;
+            SFX.StopOthers = bnStopAll.Checked;
+            //if (bnStopAll.Checked) bnStopAll.BackColor = Color.Red;
         }
 
         private void label1_DoubleClick(object sender, EventArgs e) {
+            if (isPlaceholder) return;
             SelectFile();
         }
 
         private void SelectFile() {
+            if (isPlaceholder) return;
             if (PlayerState == PlayerState.play) return;
             if (PlayerState == PlayerState.paused) Stop();
             OFD.Filter = "wav files|*.wav|All files|*.*";
@@ -169,10 +178,14 @@ namespace SFXPlayer {
         }
 
         internal void PreloadFile(object sender, EventArgs e) {
-            LoadFile();
+            if (isPlaceholder) return;
+            if (PlayerState == PlayerState.uninitialised) {
+                LoadFile();
+            }
         }
 
         private void LoadFile() {
+            if (isPlaceholder) return;
             if (!File.Exists(SFX.FileName)) return;
             PlayerState = PlayerState.loading;
             UpdatePlayerState(PlayerState);
@@ -184,6 +197,7 @@ namespace SFXPlayer {
 
 
         internal void StopOthers(object sender, EventArgs e) {
+            if (isPlaceholder) return;
             if (sender != this) {
                 //don't stop the paused ones
                 if (_musicPlayer.PlaybackState == PlaybackState.Playing) {
@@ -193,6 +207,7 @@ namespace SFXPlayer {
         }
 
         private void Stop() {
+            if (isPlaceholder) return;
             if (PlayerState == PlayerState.paused || PlayerState == PlayerState.play) {
                 _musicPlayer.Volume = 0;    //makes the stop less "clicky"
                 Thread.Sleep(10);
@@ -205,54 +220,67 @@ namespace SFXPlayer {
         private PlayerState _playerstate;
 
         private void bnPlay_Click(object sender, EventArgs e) {
+            if (isPlaceholder) return;
             try {
                 if (PlayerState == PlayerState.paused) {
                     UnPause();
                 } else if (PlayerState != PlayerState.play) {
-                    if (PlayerState == PlayerState.uninitialised) {
-                        LoadFile();
-                    }
-                    if (PlayerState == PlayerState.loaded) {
-                        Play();
-                        if (bnStopAll.Checked) {
-                            StopAll(this, new EventArgs());
-                        }
-                    }
+                    Play();
                 }
             } catch (Exception) {
                 //ReportStatus(ex.Message);
             }
         }
 
-        private void Play() {
+        public void Play() {
+            if (isPlaceholder) return;
+            if (PlayerState == PlayerState.uninitialised) {
+                LoadFile();
+            }
+            if (PlayerState == PlayerState.loaded) {
+                PlayFromStart();
+                if (bnStopAll.Checked) {
+                    StopAll(this, new EventArgs());
+                }
+            }
+        }
+
+        private void PlayFromStart() {
+            if (isPlaceholder) return;
             _musicPlayer.Position = TimeSpan.Zero;
             _musicPlayer.Play();
             PlayerState = PlayerState.play;
         }
 
         private void UnPause() {
+            if (isPlaceholder) return;
             _musicPlayer.Resume();
             PlayerState = PlayerState.play;
         }
 
         private void Pause() {
+            if (isPlaceholder) return;
             _musicPlayer.Pause();
             PlayerState = PlayerState.paused;
         }
 
         private void bnStop_Click(object sender, EventArgs e) {
+            if (isPlaceholder) return;
             Stop();
         }
 
         private void tbDescription_MouseDoubleClick(object sender, MouseEventArgs e) {
+            if (isPlaceholder) return;
             SelectFile();
         }
 
         private void tableLayoutPanel1_MouseDoubleClick(object sender, MouseEventArgs e) {
+            if (isPlaceholder) return;
             SelectFile();
         }
 
         internal void ProgressUpdate(object sender, EventArgs e) {
+            if (isPlaceholder) return;
             UpdatePosition(_musicPlayer.Position);
         }
 
@@ -260,6 +288,7 @@ namespace SFXPlayer {
         internal static ComboBox PreviewDevices;
 
         private void UpdatePosition(TimeSpan position) {
+            if (isPlaceholder) return;
             double end = _musicPlayer.Length.TotalSeconds;
             double now = _musicPlayer.Position.TotalSeconds;
             int pct = (int)(now / end * Width);
@@ -271,6 +300,7 @@ namespace SFXPlayer {
         }
 
         private void DrawGraph(int pct) {
+            if (isPlaceholder) return;
             pct = Math.Max(0, Math.Min(Width, pct));
             Graphics graphGraphics = Graphics.FromImage(graph);
             SolidBrush brush = new SolidBrush(Settings.Default.ColourPlayerPlay);
@@ -284,10 +314,15 @@ namespace SFXPlayer {
         }
 
         private void PlayStrip_Load(object sender, EventArgs e) {
+            if (isPlaceholder) return;
             graph = new Bitmap(Width, Height);
             BackgroundImage = graph;
             //BackgroundImageLayout = ImageLayout.Stretch;
             DrawGraph(Progress);
+        }
+
+        private void PlayStrip_Resize(object sender, EventArgs e) {
+            PlayStrip_Load(sender, e);
         }
     }
 }
