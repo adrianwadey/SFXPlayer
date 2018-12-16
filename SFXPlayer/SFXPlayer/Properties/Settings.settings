@@ -20,5 +20,14 @@
     <Setting Name="ColourPlayerBackground" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">Silver</Value>
     </Setting>
+    <Setting Name="LastProjectFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LastAudioFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ArchiveFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

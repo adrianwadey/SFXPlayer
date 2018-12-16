@@ -11,6 +11,7 @@ namespace SFXPlayer {
         /// </summary>
         [STAThread]
         static void Main() {
+            Properties.Settings.Default.Upgrade();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             mainForm = new Form1();

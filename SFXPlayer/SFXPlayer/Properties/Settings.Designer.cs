@@ -94,5 +94,41 @@ namespace SFXPlayer.Properties {
                 this["ColourPlayerBackground"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastProjectFolder {
+            get {
+                return ((string)(this["LastProjectFolder"]));
+            }
+            set {
+                this["LastProjectFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastAudioFolder {
+            get {
+                return ((string)(this["LastAudioFolder"]));
+            }
+            set {
+                this["LastAudioFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ArchiveFolder {
+            get {
+                return ((string)(this["ArchiveFolder"]));
+            }
+            set {
+                this["ArchiveFolder"] = value;
+            }
+        }
     }
 }

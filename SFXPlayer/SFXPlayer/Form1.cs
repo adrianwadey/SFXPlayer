@@ -13,11 +13,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using AJW.General;
+using System.IO;
 
 namespace SFXPlayer {
     public partial class Form1 : Form {
         const string FileExtensions = "Show Files (*.sfx)|*.sfx";
-        private XMLFileHandler<Show> FileHandler = new XMLFileHandler<Show>();
+        private XMLFileHandler<Show> ShowFileHandler = new XMLFileHandler<Show>();
         private Show CurrentShow;
         private const int cueListSpacing = 35;
         private readonly ObservableCollection<MMDevice> _devices = new ObservableCollection<MMDevice>();
@@ -44,14 +45,14 @@ namespace SFXPlayer {
             this.statusBar.ShowPanels = true;
             this.statusBar.Panels.Add(panel);
 
-            FileHandler.FileExtensions = FileExtensions;
+            ShowFileHandler.FileExtensions = FileExtensions;
             cuelistFormSpacing = this.Height - CueList.Height;
             bnPlayNext.Top = TOP_PLACEHOLDERS * cueListSpacing + CueList.Top;
             bnPlayNext.Height = new PlayStrip().Height;
             bnPlayNext.BackColor = Settings.Default.ColourPlayerPlay;
             bnDeleteCue.Top = bnAddCue.Top = bnPlayNext.Top + (bnPlayNext.Height - bnAddCue.Height) / 2;
             rtMainText.Top = bnPlayNext.Bottom + rtMainText.Margin.Top + bnPlayNext.Margin.Bottom;
-            PlayStrip.OFD = openFileDialog1;
+            PlayStrip.OFD = dlgOpenAudioFile;
             PlayStrip.Devices = comboBox1;
             PlayStrip.PreviewDevices = comboBox2;
         }
@@ -68,14 +69,21 @@ namespace SFXPlayer {
             //player.SoundLocationChanged += new EventHandler(player_LocationChanged);
         }
 
-        
+
         // Convenience method for setting message text in 
         // the status bar.
-        private void ReportStatus(string statusMessage) {
+        public void ReportStatus(string statusMessage) {
             // If the caller passed in a message...
-            if ((statusMessage != null) && (statusMessage != String.Empty)) {
-                // ...post the caller's message to the status bar.
-                this.statusBar.Panels[0].Text = statusMessage;
+
+            if (this.statusBar.InvokeRequired) {
+                Action<string> d = new Action<string>(ReportStatus);
+                this.Invoke(d, new object[] { statusMessage });
+            } else {
+                if (string.IsNullOrEmpty(statusMessage)) {
+
+                } else {
+                    this.statusBar.Panels[0].Text = statusMessage;
+                }
             }
         }
 
@@ -106,6 +114,7 @@ namespace SFXPlayer {
 
         private void NextPlayCueChanged() {
             rtMainText.Text = NextPlayCue.SFX.MainText;
+            CurrentShow.NextPlayCueIndex = NextPlayCueIndex;
         }
 
         private void Form1_Load(object sender, EventArgs e) {
@@ -162,20 +171,41 @@ namespace SFXPlayer {
         //}
 
         void FileNew() {
+            if (CurrentShow != null) CurrentShow.ShowFileBecameDirty -= ShowFileHandler.SetDirty;
             CueList.Controls.Clear();
             CurrentShow = new Show();
             CurrentShow.UpdateShow += UpdateDisplay;
+            CurrentShow.ShowFileBecameDirty += ShowFileHandler.SetDirty;
         }
 
         void FileOpen() {
             Show oldShow = CurrentShow;
-            CurrentShow = FileHandler.LoadFromFile();
+            oldShow.ShowFileBecameDirty -= ShowFileHandler.SetDirty;
+            CurrentShow = ShowFileHandler.LoadFromFile();
             if (CurrentShow != null) {
+                int tempNextPlayCueIndex = CurrentShow.NextPlayCueIndex;
                 CurrentShow.UpdateShow += UpdateDisplay;
                 ResetDisplay();
+                NextPlayCueIndex = tempNextPlayCueIndex;
             } else {
                 CurrentShow = oldShow;
             }
+            CurrentShow.ShowFileBecameDirty += ShowFileHandler.SetDirty;
+        }
+
+        void FileOpen(string FileName) {
+            Show oldShow = CurrentShow;
+            oldShow.ShowFileBecameDirty -= ShowFileHandler.SetDirty;
+            CurrentShow = ShowFileHandler.LoadFromFile(FileName);
+            if (CurrentShow != null) {
+                int tempNextPlayCueIndex = CurrentShow.NextPlayCueIndex;
+                CurrentShow.UpdateShow += UpdateDisplay;
+                ResetDisplay();
+                NextPlayCueIndex = tempNextPlayCueIndex;
+            } else {
+                CurrentShow = oldShow;
+            }
+            CurrentShow.ShowFileBecameDirty += ShowFileHandler.SetDirty;
         }
 
         void UpdateDisplay() {
@@ -323,28 +353,28 @@ namespace SFXPlayer {
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e) {
-            if (FileHandler.CheckSave(CurrentShow) != DialogResult.OK) return;
+            if (ShowFileHandler.CheckSave(CurrentShow) != DialogResult.OK) return;
             FileNew();
             NextPlayCueChanged();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
             if (e.CloseReason == CloseReason.TaskManagerClosing) return;    //allow close from task manager
-            if (FileHandler.CheckSave(CurrentShow) != DialogResult.OK) {
+            if (ShowFileHandler.CheckSave(CurrentShow) != DialogResult.OK) {
                 e.Cancel = true;
             }
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e) {
-            FileHandler.Save(CurrentShow);
+            ShowFileHandler.Save(CurrentShow);
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e) {
-            FileHandler.SaveAs(CurrentShow);
+            ShowFileHandler.SaveAs(CurrentShow);
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e) {
-            if (FileHandler.CheckSave(CurrentShow) != DialogResult.OK) return;
+            if (ShowFileHandler.CheckSave(CurrentShow) != DialogResult.OK) return;
             FileOpen();
         }
 
@@ -374,6 +404,63 @@ namespace SFXPlayer {
 
         private void rtMainText_TextChanged(object sender, EventArgs e) {
             NextPlayCue.SFX.MainText = rtMainText.Text;
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e) {
+            Close();
+        }
+
+        private void exportShowFileToolStripMenuItem_Click(object sender, EventArgs e) {
+            string archiveFile = CurrentShow.CreateArchive(ShowFileHandler.CurrentFileName);
+            SaveFileDialog sfdArch = new SaveFileDialog();
+            sfdArch.FileName = Path.GetFileName(archiveFile);
+            if (Directory.Exists(Settings.Default.ArchiveFolder)) {
+                sfdArch.InitialDirectory = Settings.Default.ArchiveFolder;
+            } else {
+                sfdArch.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
+            if (sfdArch.ShowDialog() == DialogResult.OK) {
+                File.Move(archiveFile, sfdArch.FileName);
+                Settings.Default.ArchiveFolder = Path.GetDirectoryName(sfdArch.FileName);
+                Settings.Default.Save();
+            } else {
+                File.Delete(archiveFile);
+            }
+        }
+
+        private void importShowFileToolStripMenuItem_Click(object sender, EventArgs e) {
+            //choose file
+            if (ShowFileHandler.CheckSave(CurrentShow) != DialogResult.OK) return;
+            OpenFileDialog ofdArch = new OpenFileDialog();
+            if (Directory.Exists(Settings.Default.ArchiveFolder)) {
+                ofdArch.InitialDirectory = Settings.Default.ArchiveFolder;
+            } else {
+                ofdArch.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
+            if (ofdArch.ShowDialog() == DialogResult.OK) {
+                //choose where to put it
+                FolderBrowserDialog fbdArchive = new FolderBrowserDialog();
+                fbdArchive.ShowNewFolderButton = true;
+                if (!string.IsNullOrEmpty(Settings.Default.LastProjectFolder)) {
+                    fbdArchive.SelectedPath = new FileInfo(Path.GetDirectoryName(Settings.Default.LastProjectFolder)).Directory.FullName;
+                } else {
+                    fbdArchive.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                }
+                fbdArchive.Description = "Choose Folder for Show";
+                if (fbdArchive.ShowDialog() == DialogResult.OK) {
+                    string ShowFolder = fbdArchive.SelectedPath;
+                    if (new DirectoryInfo(ShowFolder).GetFiles().Count() != 0) {
+                        ReportStatus("Files found = " + new DirectoryInfo(ShowFolder).GetFiles().Count() + ". Creating show folder");
+                        ShowFolder = Path.Combine(ShowFolder, Path.GetFileNameWithoutExtension(ofdArch.FileName));
+                        Directory.CreateDirectory(ShowFolder);
+                    }
+                    string ExtractedShow = SFXPlayer.Show.ExtractArchive(ofdArch.FileName, ShowFolder);
+                    if (!string.IsNullOrEmpty(ExtractedShow) && File.Exists(ExtractedShow)) {
+                        ReportStatus("Show extracted to " + ExtractedShow);
+                        FileOpen(ExtractedShow);
+                    }
+                }
+            }
         }
     }
 }

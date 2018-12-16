@@ -9,6 +9,7 @@ using CSCore.SoundOut;
 using SFXPlayer.Properties;
 using System.Threading;
 using System.IO;
+using System.Diagnostics;
 
 namespace SFXPlayer {
     enum PlayerState {
@@ -170,7 +171,11 @@ namespace SFXPlayer {
             if (PlayerState == PlayerState.play) return;
             if (PlayerState == PlayerState.paused) Stop();
             OFD.Filter = "wav files|*.wav|All files|*.*";
+            if (Directory.Exists(Settings.Default.LastAudioFolder)) {
+                OFD.InitialDirectory = Settings.Default.LastAudioFolder;
+            }
             if (OFD.ShowDialog() == DialogResult.OK) {
+                Settings.Default.LastAudioFolder = Path.GetDirectoryName(OFD.FileName); Settings.Default.Save();
                 if (tbDescription.Text == SFX.ShortFileName) tbDescription.Text = "";
                 SFX.FileName = OFD.FileName;
                 if (tbDescription.Text == "") tbDescription.Text = SFX.ShortFileName;
@@ -188,7 +193,12 @@ namespace SFXPlayer {
 
         private void LoadFile() {
             if (isPlaceholder) return;
-            if (!File.Exists(SFX.FileName)) return;
+            if (string.IsNullOrEmpty(SFX.FileName)) return;
+            if (!File.Exists(SFX.FileName)) {
+                Program.mainForm.ReportStatus("File not found: " + SFX.FileName);
+                Debug.WriteLine("File not found: " + Path.GetFullPath(SFX.FileName));
+                return;
+            }
             PlayerState = PlayerState.loading;
             UpdatePlayerState(PlayerState);
             _musicPlayer.Open(SFX.FileName, (MMDevice)Devices.SelectedItem);
@@ -317,6 +327,7 @@ namespace SFXPlayer {
 
         private void PlayStrip_Load(object sender, EventArgs e) {
             if (isPlaceholder) return;
+            if (Program.mainForm.WindowState == FormWindowState.Minimized) return;
             graph = new Bitmap(Width, Height);
             BackgroundImage = graph;
             //BackgroundImageLayout = ImageLayout.Stretch;
