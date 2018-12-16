@@ -31,22 +31,25 @@
             this.bnPause = new System.Windows.Forms.Button();
             this.bnStopAll = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.bnFile = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
             // 
-            this.tableLayoutPanel1.ColumnCount = 5;
+            this.tableLayoutPanel1.ColumnCount = 6;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
             this.tableLayoutPanel1.Controls.Add(this.lbIndex, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.tbDescription, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.bnPlay, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.bnPause, 3, 0);
-            this.tableLayoutPanel1.Controls.Add(this.bnStopAll, 4, 0);
+            this.tableLayoutPanel1.Controls.Add(this.bnPlay, 3, 0);
+            this.tableLayoutPanel1.Controls.Add(this.bnPause, 4, 0);
+            this.tableLayoutPanel1.Controls.Add(this.bnStopAll, 5, 0);
+            this.tableLayoutPanel1.Controls.Add(this.bnFile, 2, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -73,7 +76,7 @@
             this.tbDescription.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbDescription.Location = new System.Drawing.Point(34, 3);
             this.tbDescription.Name = "tbDescription";
-            this.tbDescription.Size = new System.Drawing.Size(330, 20);
+            this.tbDescription.Size = new System.Drawing.Size(304, 20);
             this.tbDescription.TabIndex = 1;
             this.tbDescription.TextChanged += new System.EventHandler(this.tbDescription_TextChanged);
             this.tbDescription.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.tbDescription_MouseDoubleClick);
@@ -112,6 +115,17 @@
             this.bnStopAll.UseVisualStyleBackColor = true;
             this.bnStopAll.CheckedChanged += new System.EventHandler(this.cbLoop_CheckedChanged);
             // 
+            // bnFile
+            // 
+            this.bnFile.Location = new System.Drawing.Point(344, 3);
+            this.bnFile.Name = "bnFile";
+            this.bnFile.Size = new System.Drawing.Size(20, 21);
+            this.bnFile.TabIndex = 5;
+            this.bnFile.Text = "File";
+            this.toolTip1.SetToolTip(this.bnFile, "File");
+            this.bnFile.UseVisualStyleBackColor = true;
+            this.bnFile.Click += new System.EventHandler(this.bnFile_Click);
+            // 
             // PlayStrip
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -138,5 +152,6 @@
         private System.Windows.Forms.Button bnPause;
         private System.Windows.Forms.CheckBox bnStopAll;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Button bnFile;
     }
 }

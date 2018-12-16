@@ -47,6 +47,7 @@ namespace SFXPlayer {
             InitializeComponent();
             InitializeSound();
             this.SFX = SFX;
+            UpdateFileToolTip();
         }
         // Sets up the SoundPlayer object.
         private void InitializeSound() {
@@ -174,6 +175,7 @@ namespace SFXPlayer {
                 SFX.FileName = OFD.FileName;
                 if (tbDescription.Text == "") tbDescription.Text = SFX.ShortFileName;
                 PlayerState = PlayerState.uninitialised;
+                UpdateFileToolTip();
             }
         }
 
@@ -323,6 +325,27 @@ namespace SFXPlayer {
 
         private void PlayStrip_Resize(object sender, EventArgs e) {
             PlayStrip_Load(sender, e);
+        }
+
+        private void bnFile_Click(object sender, EventArgs e) {
+            if (isPlaceholder) return;
+            if (PlayerState == PlayerState.play) return;
+            if (string.IsNullOrEmpty(SFX.FileName)) {
+                SelectFile();
+            } else {
+                SFX.FileName = "";
+                PlayerState = PlayerState.uninitialised;
+            }
+            UpdateFileToolTip();
+        }
+
+        private void UpdateFileToolTip() {
+            if (string.IsNullOrEmpty(SFX.FileName)) {
+                toolTip1.SetToolTip(bnFile, "Select File");
+            } else {
+                toolTip1.SetToolTip(bnFile, SFX.ShortFileName);
+            }
+
         }
     }
 }
