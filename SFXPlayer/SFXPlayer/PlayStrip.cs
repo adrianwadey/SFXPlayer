@@ -307,7 +307,9 @@ namespace SFXPlayer {
             if (pct == Progress) return;
             Progress = pct;
             //lbIndex.Text = ((int)(now / end * 100)).ToString("D3");
+            SuspendLayout();
             DrawGraph(pct);
+            ResumeLayout();
             Refresh();
         }
 
