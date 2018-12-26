@@ -19,7 +19,6 @@ namespace SFXPlayer {
     }
     [Serializable]
     public class Show {
-        [XmlIgnore] public Panel Panel;
         public ObservableCollection<SFX> Cues = new ObservableCollection<SFX>();
         public event Action UpdateShow;
         [DefaultValue(0)]
@@ -39,7 +38,6 @@ namespace SFXPlayer {
         private void Cues_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
             switch (e.Action) {
                 case NotifyCollectionChangedAction.Add:
-
                     break;
                 case NotifyCollectionChangedAction.Move:
                     break;
@@ -48,9 +46,9 @@ namespace SFXPlayer {
                 case NotifyCollectionChangedAction.Replace:
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    OnUpdateShow();
                     break;
             }
+            OnUpdateShow();
             ShowFileBecameDirty?.Invoke();
             //Dirty = true; need to set it in filehandler
             Debug.WriteLine(e.Action);

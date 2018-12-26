@@ -277,7 +277,19 @@ namespace SFXPlayer {
         }
 
         void UpdateDisplay() {
+        }
 
+        void UpdateDisplayedIndexes() {
+                //renumber the cues
+                int Index = 1;
+            foreach (Control ctl in CueList.Controls) {
+                if (ctl.GetType() == typeof(PlayStrip)) {
+                    var ps = ctl as PlayStrip;
+                    if (!ps.isPlaceholder) {
+                        ps.Index = Index++;
+                    }
+                }
+            }
         }
 
         void ResetDisplay() {
@@ -348,6 +360,8 @@ namespace SFXPlayer {
             foreach (Control ctl in CueList.Controls) {
                 //Debug.WriteLine(ctl.ToString());
             }
+
+            UpdateDisplayedIndexes();
         }
 
         private void CueList_Scroll(object sender, ScrollEventArgs e) {
@@ -405,14 +419,16 @@ namespace SFXPlayer {
         }
 
         private void bnAddCue_Click(object sender, EventArgs e) {
+            int newPosition = Math.Min(NextPlayCueIndex, CurrentShow.Cues.Count);
             SFX sfx = new SFX();
-            CurrentShow.AddCue(sfx, Math.Min(NextPlayCueIndex, CurrentShow.Cues.Count));
             PlayStrip ps = new PlayStrip(sfx);
             ps.Width = CueList.ClientSize.Width;
             CueList.Controls.Add(ps);
-            CueList.Controls.SetChildIndex(ps, paddedTop + CurrentShow.Cues.IndexOf(sfx));
+            CueList.Controls.SetChildIndex(ps, paddedTop + newPosition);
             //CueList.Refresh();
             PadCueList();
+            //Add to the show once the controls are in place so they can be updated
+            CurrentShow.AddCue(sfx, newPosition);
             NextPlayCueChanged();
         }
 
