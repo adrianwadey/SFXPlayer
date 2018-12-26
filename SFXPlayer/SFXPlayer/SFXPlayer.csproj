@@ -24,10 +24,11 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
+    <SupportUrl>https://github.com/adrianwadey/SFXPlayer</SupportUrl>
     <ProductName>SFX Launcher</ProductName>
     <PublisherName>Adrian Wadey</PublisherName>
     <SuiteName>SFX</SuiteName>
-    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -68,7 +69,10 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>false</SignManifests>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL">
@@ -118,6 +122,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SFX.cs" />
     <Compile Include="Show.cs" />
+    <Compile Include="ucVolume.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ucVolume.Designer.cs">
+      <DependentUpon>ucVolume.cs</DependentUpon>
+    </Compile>
     <Compile Include="WAVSounds.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
@@ -136,6 +146,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="ucVolume.resx">
+      <DependentUpon>ucVolume.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="..\..\README.md">
       <Link>README.md</Link>
     </None>
@@ -170,9 +183,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
       <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
+      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 and x64%29</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
@@ -182,9 +195,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <FileAssociation Include=".cues">
+    <FileAssociation Include=".sfx">
       <Visible>False</Visible>
-      <Description>Cue List</Description>
+      <Description>SFX Cue List</Description>
       <Progid>cues</Progid>
       <DefaultIcon>Play.ico</DefaultIcon>
     </FileAssociation>

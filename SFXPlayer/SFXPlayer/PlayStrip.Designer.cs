@@ -30,16 +30,18 @@
             this.bnPlay = new System.Windows.Forms.Button();
             this.bnPause = new System.Windows.Forms.Button();
             this.bnStopAll = new System.Windows.Forms.CheckBox();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.bnFile = new System.Windows.Forms.Button();
+            this.bnVolume = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
             // 
-            this.tableLayoutPanel1.ColumnCount = 6;
+            this.tableLayoutPanel1.ColumnCount = 7;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
@@ -50,12 +52,13 @@
             this.tableLayoutPanel1.Controls.Add(this.bnPause, 4, 0);
             this.tableLayoutPanel1.Controls.Add(this.bnStopAll, 5, 0);
             this.tableLayoutPanel1.Controls.Add(this.bnFile, 2, 0);
+            this.tableLayoutPanel1.Controls.Add(this.bnVolume, 6, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(445, 27);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(386, 27);
             this.tableLayoutPanel1.TabIndex = 0;
             this.tableLayoutPanel1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.tableLayoutPanel1_MouseDoubleClick);
             // 
@@ -76,7 +79,7 @@
             this.tbDescription.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbDescription.Location = new System.Drawing.Point(34, 3);
             this.tbDescription.Name = "tbDescription";
-            this.tbDescription.Size = new System.Drawing.Size(304, 20);
+            this.tbDescription.Size = new System.Drawing.Size(219, 20);
             this.tbDescription.TabIndex = 1;
             this.tbDescription.TextChanged += new System.EventHandler(this.tbDescription_TextChanged);
             this.tbDescription.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.tbDescription_MouseDoubleClick);
@@ -85,7 +88,7 @@
             // 
             this.bnPlay.BackgroundImage = global::SFXPlayer.Properties.Resources.Play;
             this.bnPlay.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.bnPlay.Location = new System.Drawing.Point(370, 3);
+            this.bnPlay.Location = new System.Drawing.Point(285, 3);
             this.bnPlay.Name = "bnPlay";
             this.bnPlay.Size = new System.Drawing.Size(20, 20);
             this.bnPlay.TabIndex = 2;
@@ -96,7 +99,7 @@
             // 
             this.bnPause.BackgroundImage = global::SFXPlayer.Properties.Resources.Stop;
             this.bnPause.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.bnPause.Location = new System.Drawing.Point(396, 3);
+            this.bnPause.Location = new System.Drawing.Point(311, 3);
             this.bnPause.Name = "bnPause";
             this.bnPause.Size = new System.Drawing.Size(20, 20);
             this.bnPause.TabIndex = 3;
@@ -106,7 +109,7 @@
             // bnStopAll
             // 
             this.bnStopAll.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.bnStopAll.Location = new System.Drawing.Point(425, 6);
+            this.bnStopAll.Location = new System.Drawing.Point(340, 6);
             this.bnStopAll.Margin = new System.Windows.Forms.Padding(6);
             this.bnStopAll.Name = "bnStopAll";
             this.bnStopAll.Size = new System.Drawing.Size(14, 15);
@@ -117,7 +120,7 @@
             // 
             // bnFile
             // 
-            this.bnFile.Location = new System.Drawing.Point(344, 3);
+            this.bnFile.Location = new System.Drawing.Point(259, 3);
             this.bnFile.Name = "bnFile";
             this.bnFile.Size = new System.Drawing.Size(20, 21);
             this.bnFile.TabIndex = 5;
@@ -125,6 +128,17 @@
             this.toolTip1.SetToolTip(this.bnFile, "File");
             this.bnFile.UseVisualStyleBackColor = true;
             this.bnFile.Click += new System.EventHandler(this.bnFile_Click);
+            // 
+            // bnVolume
+            // 
+            this.bnVolume.Location = new System.Drawing.Point(363, 3);
+            this.bnVolume.Name = "bnVolume";
+            this.bnVolume.Size = new System.Drawing.Size(20, 20);
+            this.bnVolume.TabIndex = 6;
+            this.bnVolume.Text = "Volume";
+            this.bnVolume.UseVisualStyleBackColor = true;
+            this.bnVolume.Click += new System.EventHandler(this.bnVolume_Click);
+            this.bnVolume.Enter += new System.EventHandler(this.bnVolume_Enter);
             // 
             // PlayStrip
             // 
@@ -134,7 +148,7 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.DoubleBuffered = true;
             this.Name = "PlayStrip";
-            this.Size = new System.Drawing.Size(445, 27);
+            this.Size = new System.Drawing.Size(386, 27);
             this.Load += new System.EventHandler(this.PlayStrip_Load);
             this.Resize += new System.EventHandler(this.PlayStrip_Resize);
             this.tableLayoutPanel1.ResumeLayout(false);
@@ -153,5 +167,6 @@
         private System.Windows.Forms.CheckBox bnStopAll;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button bnFile;
+        private System.Windows.Forms.Button bnVolume;
     }
 }

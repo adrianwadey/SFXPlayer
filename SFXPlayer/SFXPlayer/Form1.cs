@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Media;
+using static System.Reflection.MethodBase;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,9 +20,27 @@ namespace SFXPlayer {
     public partial class Form1 : Form {
         const string FileExtensions = "Show Files (*.sfx)|*.sfx";
         private XMLFileHandler<Show> ShowFileHandler = new XMLFileHandler<Show>();
-        private Show CurrentShow;
+        private Show _CurrentShow;
+        private Show CurrentShow {
+            get {
+                return _CurrentShow;
+            }
+            set {
+                if (_CurrentShow != null) {
+                    _CurrentShow.ShowFileBecameDirty -= ShowFileHandler.SetDirty;
+                    _CurrentShow.UpdateShow -= UpdateDisplay;
+                }
+                _CurrentShow = value;
+                ResetDisplay();
+                if (_CurrentShow != null) {
+                    _CurrentShow.ShowFileBecameDirty += ShowFileHandler.SetDirty;
+                    _CurrentShow.UpdateShow += UpdateDisplay;
+                }
+            }
+        }
         private const int cueListSpacing = 35;
         private readonly ObservableCollection<MMDevice> _devices = new ObservableCollection<MMDevice>();
+        public static Control lastFocused;
 
         public Form1() {
             // Initialize Forms Designer generated code.
@@ -119,7 +138,7 @@ namespace SFXPlayer {
 
         private void Form1_Load(object sender, EventArgs e) {
             Debug.WriteLine("Form1_Load");
-            Debug.WriteLine("Scroll Lines = " + SystemInformation.MouseWheelScrollLines);
+            Debug.WriteLine("MouseWheelScrollLines = " + SystemInformation.MouseWheelScrollLines);
 
             //get the sound devices
             using (var mmdeviceEnumerator = new MMDeviceEnumerator()) {
@@ -140,6 +159,7 @@ namespace SFXPlayer {
             comboBox2.DisplayMember = "FriendlyName";
             comboBox2.ValueMember = "DeviceID";
 
+
             ProgressTimer.Enabled = true;
             FileNew();
             ResetDisplay();
@@ -147,12 +167,64 @@ namespace SFXPlayer {
             Form1_Resize(this, new EventArgs());
 
             CueList.MouseWheel += CueList_MouseWheel;
-            CueList.ControlAdded += CueList_ControlAdded;
+            //CueList.ControlAdded += CueList_ControlAdded;
+
+            FocusTrackLowestControls(Controls);
+            //ShowContainerControls(Controls);
         }
 
-        private void CueList_ControlAdded(object sender, ControlEventArgs e) {
-            e.Control.MouseWheel += CueList_MouseWheel;
+        private void ShowContainerControls(Control.ControlCollection controls) {
+            foreach (Control ctl in controls) {
+                if (ctl.Controls.Count > 0) {
+                    Debug.WriteLine("  ** {0} {1}", ctl.Name, ctl);
+                    ShowContainerControls(ctl.Controls);
+                }
+            }
         }
+
+        private void FocusTrackLowestControls(Control control) {
+            if (control.Controls.Count > 0) {
+                FocusTrackLowestControls(control.Controls);
+            } else {
+                control.GotFocus += TrackFocused;
+                //Debug.WriteLine(" *+ {0} {1}", control.Name, control);
+            }
+        }
+
+        private void FocusTrackLowestControls(Control.ControlCollection controls) {
+            foreach (Control ctl in controls) {
+                if (ctl.Controls.Count > 0) {
+                    FocusTrackLowestControls(ctl.Controls);
+                } else {
+                    ctl.GotFocus += TrackFocused;
+                    //Debug.WriteLine(" *+ {0} {1}", ctl.Name, ctl);
+                }
+            }
+        }
+
+        private void FocusUntrackLowestControls(Control control) {
+            if (control.Controls.Count > 0) {
+                FocusUntrackLowestControls(control.Controls);
+            } else {
+                control.GotFocus -= TrackFocused;
+                //Debug.WriteLine(" *- {0} {1}", control.Name, control);
+            }
+        }
+
+        private void FocusUntrackLowestControls(Control.ControlCollection controls) {
+            foreach (Control ctl in controls) {
+                if (ctl.Controls.Count > 0) {
+                    FocusUntrackLowestControls(ctl.Controls);
+                } else {
+                    ctl.GotFocus -= TrackFocused;
+                    //Debug.WriteLine(" *- {0} {1}", ctl.Name, ctl);
+                }
+            }
+        }
+
+        //private void CueList_ControlAdded(object sender, ControlEventArgs e) {
+        //    e.Control.MouseWheel += CueList_MouseWheel;
+        //}
 
         private void CueList_MouseWheel(object sender, MouseEventArgs e) {
             //e = new HandledMouseEventArgs(e.Button, e.Clicks, e.X, e.Y, e.Delta, true);
@@ -171,26 +243,22 @@ namespace SFXPlayer {
         //}
 
         void FileNew() {
-            if (CurrentShow != null) CurrentShow.ShowFileBecameDirty -= ShowFileHandler.SetDirty;
-            CueList.Controls.Clear();
+            //if (CurrentShow != null) CurrentShow.ShowFileBecameDirty -= ShowFileHandler.SetDirty;
+            //ResetDisplay();
+            //CueList.Controls.Clear();
             CurrentShow = new Show();
-            CurrentShow.UpdateShow += UpdateDisplay;
-            CurrentShow.ShowFileBecameDirty += ShowFileHandler.SetDirty;
+            //CurrentShow.UpdateShow += UpdateDisplay;
+            //CurrentShow.ShowFileBecameDirty += ShowFileHandler.SetDirty;
         }
 
         void FileOpen() {
-            Show oldShow = CurrentShow;
-            oldShow.ShowFileBecameDirty -= ShowFileHandler.SetDirty;
-            CurrentShow = ShowFileHandler.LoadFromFile();
-            if (CurrentShow != null) {
-                int tempNextPlayCueIndex = CurrentShow.NextPlayCueIndex;
-                CurrentShow.UpdateShow += UpdateDisplay;
-                ResetDisplay();
+            Show newShow;
+            newShow = ShowFileHandler.LoadFromFile();
+            if (newShow != null) {
+                int tempNextPlayCueIndex = newShow.NextPlayCueIndex;
+                CurrentShow = newShow;
                 NextPlayCueIndex = tempNextPlayCueIndex;
-            } else {
-                CurrentShow = oldShow;
             }
-            CurrentShow.ShowFileBecameDirty += ShowFileHandler.SetDirty;
         }
 
         void FileOpen(string FileName) {
@@ -216,7 +284,6 @@ namespace SFXPlayer {
             CueList.Controls.Clear();
             foreach (SFX sfx in CurrentShow.Cues) {
                 PlayStrip ps = new PlayStrip(sfx);
-                ps.StopAll += StopAll;
                 CueList.Controls.Add(ps);
             }
             paddedTop = paddedBottom = 0;
@@ -278,6 +345,9 @@ namespace SFXPlayer {
             CueList.VerticalScroll.LargeChange = cueListSpacing;
             CueList.VerticalScroll.SmallChange = cueListSpacing;
             //CueList.AutoScrollOffset = new Point(0, TOP_PLACEHOLDERS * cueListSpacing);
+            foreach (Control ctl in CueList.Controls) {
+                //Debug.WriteLine(ctl.ToString());
+            }
         }
 
         private void CueList_Scroll(object sender, ScrollEventArgs e) {
@@ -320,9 +390,11 @@ namespace SFXPlayer {
         }
 
         private void ProgressTimer_Tick(object sender, EventArgs e) {
-            foreach (PlayStrip Player in CueList.Controls) {
-                if (Player.IsPlaying) {
-                    Player.ProgressUpdate(sender, e);
+            foreach (Control ctl in CueList.Controls) {
+                if (ctl.GetType() == typeof(PlayStrip)) {
+                    if (((PlayStrip)ctl).IsPlaying) {
+                        ((PlayStrip)ctl).ProgressUpdate(sender, e);
+                    }
                 }
             }
         }
@@ -336,6 +408,7 @@ namespace SFXPlayer {
             SFX sfx = new SFX();
             CurrentShow.AddCue(sfx, Math.Min(NextPlayCueIndex, CurrentShow.Cues.Count));
             PlayStrip ps = new PlayStrip(sfx);
+            ps.Width = CueList.ClientSize.Width;
             CueList.Controls.Add(ps);
             CueList.Controls.SetChildIndex(ps, paddedTop + CurrentShow.Cues.IndexOf(sfx));
             //CueList.Refresh();
@@ -355,7 +428,7 @@ namespace SFXPlayer {
         private void newToolStripMenuItem_Click(object sender, EventArgs e) {
             if (ShowFileHandler.CheckSave(CurrentShow) != DialogResult.OK) return;
             FileNew();
-            NextPlayCueChanged();
+            //NextPlayCueChanged();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
@@ -397,8 +470,10 @@ namespace SFXPlayer {
         }
 
         private void CueList_ClientSizeChanged(object sender, EventArgs e) {
-            foreach (PlayStrip playStrip in CueList.Controls) {
-                playStrip.Width = CueList.ClientSize.Width;
+            foreach (Control ctl in CueList.Controls) {
+                if (ctl.GetType() == typeof(PlayStrip)) {
+                    ctl.Width = CueList.ClientSize.Width;
+                }
             }
         }
 
@@ -461,6 +536,23 @@ namespace SFXPlayer {
                     }
                 }
             }
+        }
+                
+        private void CueList_ControlAdded(object sender, ControlEventArgs e) {
+            var ctl = e.Control as PlayStrip;
+            if (ctl != null) ctl.StopAll += StopAll;
+            FocusTrackLowestControls(e.Control);
+        }
+
+        private void CueList_ControlRemoved(object sender, ControlEventArgs e) {
+            var ctl = e.Control as PlayStrip;
+            if (ctl != null) ctl.StopAll -= StopAll;
+            FocusUntrackLowestControls(e.Control);
+        }
+
+        private void TrackFocused(object sender, EventArgs e) {
+            lastFocused = sender as Control;
+            //Debug.WriteLine("lastFocused = {0}", lastFocused);
         }
     }
 }

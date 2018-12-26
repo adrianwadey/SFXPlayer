@@ -17,6 +17,8 @@ namespace SFXPlayer {
         public bool StopOthers;
         [DefaultValue("")]
         public string MainText;
+        [DefaultValue(50)]
+        public int Volume = 50;
 
         public string ShortFileName {
             get {

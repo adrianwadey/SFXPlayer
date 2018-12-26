@@ -24,6 +24,7 @@ namespace SFXPlayer {
 
         private Bitmap graph;
         private readonly MusicPlayer _musicPlayer = new MusicPlayer();
+        ucVolume volume = new ucVolume();
         public event EventHandler StopAll;
 
         private MMDevice loadedDevice;
@@ -44,9 +45,7 @@ namespace SFXPlayer {
             SFX = new SFX();
         }
 
-        public PlayStrip(SFX SFX) {
-            InitializeComponent();
-            InitializeSound();
+        public PlayStrip(SFX SFX) : this() {
             this.SFX = SFX;
             UpdateFileToolTip();
         }
@@ -70,6 +69,14 @@ namespace SFXPlayer {
                 //    btnPlay.Enabled = btnStop.Enabled = btnPause.Enabled = false;
             };
             _musicPlayer.PlaybackStopped += _musicPlayer_PlaybackStopped;
+            volume.VolumeChanged += Volume_VolumeChanged;
+            volume.Done += Volume_Done;
+            
+        }
+
+        private void Volume_VolumeChanged(object sender, EventArgs e) {
+            SFX.Volume = volume.Volume;
+            _musicPlayer.Volume = SFX.Volume;
         }
 
         private void _musicPlayer_PlaybackStopped(object sender, PlaybackStoppedEventArgs e) {
@@ -201,8 +208,9 @@ namespace SFXPlayer {
             }
             PlayerState = PlayerState.loading;
             UpdatePlayerState(PlayerState);
-            _musicPlayer.Open(SFX.FileName, (MMDevice)Devices.SelectedItem);
             loadedDevice = (MMDevice)Devices.SelectedItem;
+            _musicPlayer.Open(SFX.FileName, loadedDevice);
+            _musicPlayer.Volume = SFX.Volume;
             PlayerState = PlayerState.loaded;
         }
 
@@ -224,7 +232,7 @@ namespace SFXPlayer {
                 _musicPlayer.Volume = 0;    //makes the stop less "clicky"
                 Thread.Sleep(10);
                 _musicPlayer.Stop();
-                _musicPlayer.Volume = 100;
+                _musicPlayer.Volume = SFX.Volume;
                 PlayerState = PlayerState.loaded;
             }
         }
@@ -253,13 +261,14 @@ namespace SFXPlayer {
                 PlayFromStart();
             }
             if (bnStopAll.Checked) {
-                StopAll(this, new EventArgs());
+                StopAll?.Invoke(this, new EventArgs());
             }
         }
 
         private void PlayFromStart() {
             if (isPlaceholder) return;
-            _musicPlayer.Position = TimeSpan.Zero;
+            _musicPlayer.Position = TimeSpan.Zero;  //this resets the volume!
+            _musicPlayer.Volume = SFX.Volume;
             _musicPlayer.Play();
             PlayerState = PlayerState.play;
         }
@@ -360,5 +369,37 @@ namespace SFXPlayer {
             }
 
         }
+
+        bool justHidden = false;
+
+        private void bnVolume_Enter(object sender, EventArgs e) {
+            if (Form1.lastFocused == volume.Controls[0]) {
+                justHidden = true;
+            }
+        }
+
+        private void bnVolume_Click(object sender, EventArgs e) {
+            if (justHidden) {
+                justHidden = false;
+            } else {
+                Parent.Controls.Add(volume);
+                Parent.Controls.SetChildIndex(volume, 0);
+                Point Loc = Location;
+                Loc.X += Width - volume.Width;
+                Loc.Y += Height;
+                volume.Location = Loc;
+                volume.Volume = SFX.Volume;
+                volume.Focus();
+            }
+        }
+
+        private void Volume_Done(object sender, EventArgs e) {
+            //focus left the volume fader, so disconnect it
+            //Debug.WriteLine("Volume_Done - disconnecting fader control");
+            if (Parent.Controls.Contains(volume)) {
+                Parent.Controls.Remove(volume);
+            }
+        }
+
     }
 }
