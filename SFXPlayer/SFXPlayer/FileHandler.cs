@@ -12,11 +12,33 @@ namespace AJW.General {
     class XMLFileHandler<ObjectType> {
         const string AllFileExtensions = "All Files (*.*)|*.*";
         public string FileExtensions = "";
-        public string CurrentFileName = "";
-        private bool Dirty = false;      //needs to point to object dirty flag
+        public bool Dirty { get; private set; } = false;      //needs to point to object dirty flag
+
+        internal event EventHandler FileTitleUpdate;
 
         public void SetDirty() {
             Dirty = true;
+            OnFileTitleUpdate();
+        }
+
+        private void OnFileTitleUpdate() {
+            FileTitleUpdate?.Invoke(this, new EventArgs());
+        }
+
+        public string CurrentFileName { get; private set; } = "";
+        public string DisplayFileName {
+            get {
+                if (string.IsNullOrEmpty(CurrentFileName)) {
+                    return "Untitled";
+                }
+                return Path.GetFileName(CurrentFileName);
+            }
+        }
+
+        internal void NewFile() {
+            CurrentFileName = "";
+            Dirty = false;
+            OnFileTitleUpdate();
         }
 
         internal ObjectType LoadFromFile() {
@@ -42,6 +64,7 @@ namespace AJW.General {
             ObjectType temp = Load(CurrentFileName);     //needs to return new object
             Environment.CurrentDirectory = Path.GetDirectoryName(CurrentFileName);
             Dirty = false;
+            OnFileTitleUpdate();
             return temp;
         }
 
@@ -68,6 +91,7 @@ namespace AJW.General {
             } else {
                 UntrackedSave(theObject, CurrentFileName);
                 Dirty = false;
+                OnFileTitleUpdate();
             }
         }
 
@@ -116,5 +140,6 @@ namespace AJW.General {
                 return DialogResult.OK;
             }
         }
+
     }
 }

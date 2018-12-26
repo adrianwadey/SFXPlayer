@@ -38,24 +38,43 @@ namespace SFXPlayer {
         private void Cues_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
             switch (e.Action) {
                 case NotifyCollectionChangedAction.Add:
+                    foreach (SFX item in e.NewItems) {
+                        item.SFXBecameDirty += ShowFileBecameDirty;
+                    }
                     break;
                 case NotifyCollectionChangedAction.Move:
                     break;
                 case NotifyCollectionChangedAction.Remove:
+                    foreach (SFX item in e.OldItems) {
+                        item.SFXBecameDirty -= ShowFileBecameDirty;
+                    }
                     break;
                 case NotifyCollectionChangedAction.Replace:
+                    foreach (SFX item in e.OldItems) {
+                        item.SFXBecameDirty -= ShowFileBecameDirty;
+                    }
+                    foreach (SFX item in e.NewItems) {
+                        item.SFXBecameDirty += ShowFileBecameDirty;
+                    }
                     break;
                 case NotifyCollectionChangedAction.Reset:
+                    foreach (SFX item in e.OldItems) {
+                        item.SFXBecameDirty -= ShowFileBecameDirty;
+                    }
                     break;
             }
             OnUpdateShow();
-            ShowFileBecameDirty?.Invoke();
+            OnShowFileBecameDirty();
             //Dirty = true; need to set it in filehandler
             Debug.WriteLine(e.Action);
             Debug.WriteLine("OldItems (" + e.OldItems?.Count + ") " + e.OldItems);
             Debug.WriteLine("NewItems (" + e.NewItems?.Count + ") " + e.NewItems);
             Debug.WriteLine("OldStartingIndex " + e.OldStartingIndex);
             Debug.WriteLine("NewStartingIndex " + e.NewStartingIndex);
+        }
+
+        private void OnShowFileBecameDirty() {
+            ShowFileBecameDirty?.Invoke();
         }
 
         internal void AddCue(SFX SFX, int Index) {

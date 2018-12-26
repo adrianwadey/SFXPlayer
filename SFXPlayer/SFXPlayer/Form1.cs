@@ -29,12 +29,18 @@ namespace SFXPlayer {
                 if (_CurrentShow != null) {
                     _CurrentShow.ShowFileBecameDirty -= ShowFileHandler.SetDirty;
                     _CurrentShow.UpdateShow -= UpdateDisplay;
+                    foreach (SFX sfx in _CurrentShow.Cues) {
+                        sfx.SFXBecameDirty -= ShowFileHandler.SetDirty;
+                    }
                 }
                 _CurrentShow = value;
                 ResetDisplay();
                 if (_CurrentShow != null) {
                     _CurrentShow.ShowFileBecameDirty += ShowFileHandler.SetDirty;
                     _CurrentShow.UpdateShow += UpdateDisplay;
+                    foreach (SFX sfx in _CurrentShow.Cues) {
+                        sfx.SFXBecameDirty += ShowFileHandler.SetDirty;
+                    }
                 }
             }
         }
@@ -132,7 +138,9 @@ namespace SFXPlayer {
         }
 
         private void NextPlayCueChanged() {
+            rtMainText.TextChanged -= rtMainText_TextChanged;
             rtMainText.Text = NextPlayCue.SFX.MainText;
+            rtMainText.TextChanged += rtMainText_TextChanged;
             CurrentShow.NextPlayCueIndex = NextPlayCueIndex;
         }
 
@@ -140,6 +148,7 @@ namespace SFXPlayer {
             Debug.WriteLine("Form1_Load");
             Debug.WriteLine("MouseWheelScrollLines = " + SystemInformation.MouseWheelScrollLines);
 
+            ShowFileHandler.FileTitleUpdate += UpdateTitleBar;
             //get the sound devices
             using (var mmdeviceEnumerator = new MMDeviceEnumerator()) {
                 using (
@@ -171,6 +180,15 @@ namespace SFXPlayer {
 
             FocusTrackLowestControls(Controls);
             //ShowContainerControls(Controls);
+        }
+
+        private void UpdateTitleBar(object sender, EventArgs e) {
+            string Title;
+            Title = ShowFileHandler.DisplayFileName;
+            if (ShowFileHandler.Dirty) Title += "*";
+            Title += " - ";
+            Title += Application.ProductName;
+            Text = Title;
         }
 
         private void ShowContainerControls(Control.ControlCollection controls) {
@@ -243,12 +261,8 @@ namespace SFXPlayer {
         //}
 
         void FileNew() {
-            //if (CurrentShow != null) CurrentShow.ShowFileBecameDirty -= ShowFileHandler.SetDirty;
-            //ResetDisplay();
-            //CueList.Controls.Clear();
             CurrentShow = new Show();
-            //CurrentShow.UpdateShow += UpdateDisplay;
-            //CurrentShow.ShowFileBecameDirty += ShowFileHandler.SetDirty;
+            ShowFileHandler.NewFile();
         }
 
         void FileOpen() {

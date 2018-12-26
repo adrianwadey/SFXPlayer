@@ -10,15 +10,17 @@ using System.Xml.Serialization;
 namespace SFXPlayer {
     [Serializable]
     public class SFX {
-        [DefaultValue("")]
-        public string Description;
-        public string FileName;
-        [DefaultValue(false)]
-        public bool StopOthers;
-        [DefaultValue("")]
-        public string MainText;
-        [DefaultValue(50)]
-        public int Volume = 50;
+        internal Action SFXBecameDirty;
+        private string _Description = "";
+        private string _FileName = "";
+        private bool _StopOthers = false;
+        private string _MainText = "";
+        private int _Volume = 50;
+        [DefaultValue("")] public string Description { get { return _Description; } set { _Description = value; SFXBecameDirty?.Invoke(); } }
+        [DefaultValue("")] public string FileName { get { return _FileName; } set { _FileName = value; SFXBecameDirty?.Invoke(); } }
+        [DefaultValue(false)] public bool StopOthers { get { return _StopOthers; } set { _StopOthers = value; SFXBecameDirty?.Invoke(); } }
+        [DefaultValue("")] public string MainText { get { return _MainText; } set { _MainText = value; SFXBecameDirty?.Invoke(); } }
+        [DefaultValue(50)] public int Volume { get { return _Volume; } set { _Volume = value; SFXBecameDirty?.Invoke(); } }
 
         public string ShortFileName {
             get {

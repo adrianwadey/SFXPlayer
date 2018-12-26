@@ -396,6 +396,7 @@ namespace SFXPlayer {
         private void Volume_Done(object sender, EventArgs e) {
             //focus left the volume fader, so disconnect it
             //Debug.WriteLine("Volume_Done - disconnecting fader control");
+            if (Parent == null) return;     //can happen when opening a file with volume control showing
             if (Parent.Controls.Contains(volume)) {
                 Parent.Controls.Remove(volume);
             }
