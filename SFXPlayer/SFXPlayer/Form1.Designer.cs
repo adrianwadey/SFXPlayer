@@ -30,7 +30,7 @@
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.rtMainText = new System.Windows.Forms.RichTextBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.bnStopAll = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.ProgressTimer = new System.Windows.Forms.Timer(this.components);
             this.bnPlayNext = new System.Windows.Forms.Button();
@@ -51,6 +51,9 @@
             this.ScrollTimer = new System.Windows.Forms.Timer(this.components);
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.transportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.playToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stopAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -108,17 +111,17 @@
             this.comboBox2.Size = new System.Drawing.Size(183, 21);
             this.comboBox2.TabIndex = 8;
             // 
-            // button1
+            // bnStopAll
             // 
-            this.button1.BackColor = System.Drawing.Color.Red;
-            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(93, 27);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(177, 81);
-            this.button1.TabIndex = 17;
-            this.button1.Text = "STOP";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.bnStopAll.BackColor = System.Drawing.Color.Red;
+            this.bnStopAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bnStopAll.Location = new System.Drawing.Point(93, 27);
+            this.bnStopAll.Name = "bnStopAll";
+            this.bnStopAll.Size = new System.Drawing.Size(177, 81);
+            this.bnStopAll.TabIndex = 17;
+            this.bnStopAll.Text = "STOP";
+            this.bnStopAll.UseVisualStyleBackColor = false;
+            this.bnStopAll.Click += new System.EventHandler(this.bnStopAll_Click);
             // 
             // button2
             // 
@@ -169,7 +172,8 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.transportToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(800, 24);
@@ -279,6 +283,31 @@
             this.label2.TabIndex = 25;
             this.label2.Text = "Preview (Headphones)";
             // 
+            // transportToolStripMenuItem
+            // 
+            this.transportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.playToolStripMenuItem,
+            this.stopAllToolStripMenuItem});
+            this.transportToolStripMenuItem.Name = "transportToolStripMenuItem";
+            this.transportToolStripMenuItem.Size = new System.Drawing.Size(69, 20);
+            this.transportToolStripMenuItem.Text = "&Transport";
+            // 
+            // playToolStripMenuItem
+            // 
+            this.playToolStripMenuItem.Name = "playToolStripMenuItem";
+            this.playToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            this.playToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.playToolStripMenuItem.Text = "&Play";
+            this.playToolStripMenuItem.Click += new System.EventHandler(this.playToolStripMenuItem_Click);
+            // 
+            // stopAllToolStripMenuItem
+            // 
+            this.stopAllToolStripMenuItem.Name = "stopAllToolStripMenuItem";
+            this.stopAllToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
+            this.stopAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.stopAllToolStripMenuItem.Text = "Stop &All";
+            this.stopAllToolStripMenuItem.Click += new System.EventHandler(this.stopAllToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -290,7 +319,7 @@
             this.Controls.Add(this.bnAddCue);
             this.Controls.Add(this.bnPlayNext);
             this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.bnStopAll);
             this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.rtMainText);
             this.Controls.Add(this.comboBox1);
@@ -320,7 +349,7 @@
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.RichTextBox rtMainText;
         private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button bnStopAll;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Timer ProgressTimer;
         private System.Windows.Forms.Button bnPlayNext;
@@ -341,6 +370,9 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         internal System.Windows.Forms.Timer ScrollTimer;
+        private System.Windows.Forms.ToolStripMenuItem transportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem playToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem stopAllToolStripMenuItem;
     }
 }
 

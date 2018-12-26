@@ -409,7 +409,7 @@ namespace SFXPlayer {
             //ReportStatus("Scrolled to " + e.NewValue.ToString("D"));
         }
 
-        private void button1_Click(object sender, EventArgs e) {
+        private void bnStopAll_Click(object sender, EventArgs e) {
             StopAll(sender, e);
         }
 
@@ -583,6 +583,14 @@ namespace SFXPlayer {
         private void TrackFocused(object sender, EventArgs e) {
             lastFocused = sender as Control;
             //Debug.WriteLine("lastFocused = {0}", lastFocused);
+        }
+
+        private void playToolStripMenuItem_Click(object sender, EventArgs e) {
+            bnPlayNext_Click(sender, e);
+        }
+
+        private void stopAllToolStripMenuItem_Click(object sender, EventArgs e) {
+            bnStopAll_Click(sender, e);
         }
     }
 }
