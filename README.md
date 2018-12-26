@@ -1,5 +1,7 @@
 # SFXPlayer
-Windows Sound Effects Launcher
+## Windows Sound Effects Launcher ##
+
+![Screenshot](SFXPlayer/SFXPlayer/SFXPlayer.PNG)
 
 by Adrian Wadey
 
