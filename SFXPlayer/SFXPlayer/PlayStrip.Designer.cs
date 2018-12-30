@@ -150,6 +150,7 @@
             this.Name = "PlayStrip";
             this.Size = new System.Drawing.Size(386, 27);
             this.Load += new System.EventHandler(this.PlayStrip_Load);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PlayStrip_MouseDown);
             this.Resize += new System.EventHandler(this.PlayStrip_Resize);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();

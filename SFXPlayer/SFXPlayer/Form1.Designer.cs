@@ -24,6 +24,7 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.statusBar = new System.Windows.Forms.StatusBar();
             this.CueList = new System.Windows.Forms.Panel();
             this.dlgOpenAudioFile = new System.Windows.Forms.OpenFileDialog();
@@ -48,12 +49,12 @@
             this.importShowFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ScrollTimer = new System.Windows.Forms.Timer(this.components);
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.transportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.playToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ScrollTimer = new System.Windows.Forms.Timer(this.components);
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -68,6 +69,7 @@
             // 
             // CueList
             // 
+            this.CueList.AllowDrop = true;
             this.CueList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -81,6 +83,11 @@
             this.CueList.ClientSizeChanged += new System.EventHandler(this.CueList_ClientSizeChanged);
             this.CueList.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.CueList_ControlAdded);
             this.CueList.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.CueList_ControlRemoved);
+            this.CueList.DragDrop += new System.Windows.Forms.DragEventHandler(this.CueList_DragDrop);
+            this.CueList.DragEnter += new System.Windows.Forms.DragEventHandler(this.CueList_DragEnter);
+            this.CueList.DragOver += new System.Windows.Forms.DragEventHandler(this.CueList_DragOver);
+            this.CueList.DragLeave += new System.EventHandler(this.CueList_DragLeave);
+            this.CueList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.CueList_MouseDown);
             // 
             // dlgOpenAudioFile
             // 
@@ -200,7 +207,7 @@
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
@@ -208,7 +215,7 @@
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openToolStripMenuItem.Text = "&Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -216,7 +223,7 @@
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "&Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -224,41 +231,66 @@
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
             this.saveAsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveAsToolStripMenuItem.Text = "Save &As";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(160, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // exportShowFileToolStripMenuItem
             // 
             this.exportShowFileToolStripMenuItem.Name = "exportShowFileToolStripMenuItem";
-            this.exportShowFileToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.exportShowFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exportShowFileToolStripMenuItem.Text = "&Export Show File";
             this.exportShowFileToolStripMenuItem.Click += new System.EventHandler(this.exportShowFileToolStripMenuItem_Click);
             // 
             // importShowFileToolStripMenuItem
             // 
             this.importShowFileToolStripMenuItem.Name = "importShowFileToolStripMenuItem";
-            this.importShowFileToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.importShowFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.importShowFileToolStripMenuItem.Text = "&Import Show File";
             this.importShowFileToolStripMenuItem.Click += new System.EventHandler(this.importShowFileToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(160, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // transportToolStripMenuItem
+            // 
+            this.transportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.playToolStripMenuItem,
+            this.stopAllToolStripMenuItem});
+            this.transportToolStripMenuItem.Name = "transportToolStripMenuItem";
+            this.transportToolStripMenuItem.Size = new System.Drawing.Size(69, 20);
+            this.transportToolStripMenuItem.Text = "&Transport";
+            // 
+            // playToolStripMenuItem
+            // 
+            this.playToolStripMenuItem.Name = "playToolStripMenuItem";
+            this.playToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            this.playToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.playToolStripMenuItem.Text = "&Play";
+            this.playToolStripMenuItem.Click += new System.EventHandler(this.playToolStripMenuItem_Click);
+            // 
+            // stopAllToolStripMenuItem
+            // 
+            this.stopAllToolStripMenuItem.Name = "stopAllToolStripMenuItem";
+            this.stopAllToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
+            this.stopAllToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.stopAllToolStripMenuItem.Text = "Stop &All";
+            this.stopAllToolStripMenuItem.Click += new System.EventHandler(this.stopAllToolStripMenuItem_Click);
             // 
             // ScrollTimer
             // 
@@ -283,33 +315,9 @@
             this.label2.TabIndex = 25;
             this.label2.Text = "Preview (Headphones)";
             // 
-            // transportToolStripMenuItem
-            // 
-            this.transportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.playToolStripMenuItem,
-            this.stopAllToolStripMenuItem});
-            this.transportToolStripMenuItem.Name = "transportToolStripMenuItem";
-            this.transportToolStripMenuItem.Size = new System.Drawing.Size(69, 20);
-            this.transportToolStripMenuItem.Text = "&Transport";
-            // 
-            // playToolStripMenuItem
-            // 
-            this.playToolStripMenuItem.Name = "playToolStripMenuItem";
-            this.playToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.playToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.playToolStripMenuItem.Text = "&Play";
-            this.playToolStripMenuItem.Click += new System.EventHandler(this.playToolStripMenuItem_Click);
-            // 
-            // stopAllToolStripMenuItem
-            // 
-            this.stopAllToolStripMenuItem.Name = "stopAllToolStripMenuItem";
-            this.stopAllToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.stopAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.stopAllToolStripMenuItem.Text = "Stop &All";
-            this.stopAllToolStripMenuItem.Click += new System.EventHandler(this.stopAllToolStripMenuItem_Click);
-            // 
             // Form1
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
@@ -327,6 +335,7 @@
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.menuStrip1);
             this.DoubleBuffered = true;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(816, 489);
@@ -334,6 +343,7 @@
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.Resize += new System.EventHandler(this.Form1_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

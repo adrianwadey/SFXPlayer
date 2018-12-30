@@ -64,8 +64,7 @@ namespace SFXPlayer {
                     break;
             }
             OnUpdateShow();
-            OnShowFileBecameDirty();
-            //Dirty = true; need to set it in filehandler
+            OnShowFileBecameDirty();            //Dirty = true; need to set it in filehandler
             Debug.WriteLine(e.Action);
             Debug.WriteLine("OldItems (" + e.OldItems?.Count + ") " + e.OldItems);
             Debug.WriteLine("NewItems (" + e.NewItems?.Count + ") " + e.NewItems);

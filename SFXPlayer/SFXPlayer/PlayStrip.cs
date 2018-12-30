@@ -74,6 +74,24 @@ namespace SFXPlayer {
             
         }
 
+        private void PlayStrip_Load(object sender, EventArgs e) {
+            if (isPlaceholder) return;
+            int c = AddMouseDownEventHandler(this, PlayStrip_MouseDown);
+            Debug.WriteLine("{0} controls+= handler", c);
+        }
+
+        int AddMouseDownEventHandler(Control parent, MouseEventHandler mouseEventHandler) {
+            int count = 0;
+            parent.MouseDown += mouseEventHandler;
+            count++;
+            foreach (Control control in parent.Controls) {
+                if (control != bnVolume) {
+                    count += AddMouseDownEventHandler(control, mouseEventHandler);
+                }
+            }
+            return count;
+        }
+
         private void Volume_VolumeChanged(object sender, EventArgs e) {
             SFX.Volume = volume.Volume;
             _musicPlayer.Volume = SFX.Volume;
@@ -182,13 +200,17 @@ namespace SFXPlayer {
                 OFD.InitialDirectory = Settings.Default.LastAudioFolder;
             }
             if (OFD.ShowDialog() == DialogResult.OK) {
-                Settings.Default.LastAudioFolder = Path.GetDirectoryName(OFD.FileName); Settings.Default.Save();
-                if (tbDescription.Text == SFX.ShortFileName) tbDescription.Text = "";
-                SFX.FileName = OFD.FileName;
-                if (tbDescription.Text == "") tbDescription.Text = SFX.ShortFileName;
-                PlayerState = PlayerState.uninitialised;
-                UpdateFileToolTip();
+                SetFile(OFD.FileName);
             }
+        }
+
+        public void SetFile(string FileName) {
+            Settings.Default.LastAudioFolder = Path.GetDirectoryName(FileName); Settings.Default.Save();
+            if (tbDescription.Text == SFX.ShortFileName) tbDescription.Text = "";
+            SFX.FileName = FileName;
+            if (tbDescription.Text == "") tbDescription.Text = SFX.ShortFileName;
+            PlayerState = PlayerState.uninitialised;
+            UpdateFileToolTip();
         }
 
         internal void PreloadFile(object sender, EventArgs e) {
@@ -226,7 +248,7 @@ namespace SFXPlayer {
             }
         }
 
-        private void Stop() {
+        public void Stop() {
             if (isPlaceholder) return;
             if (PlayerState == PlayerState.paused || PlayerState == PlayerState.play) {
                 _musicPlayer.Volume = 0;    //makes the stop less "clicky"
@@ -336,17 +358,13 @@ namespace SFXPlayer {
             }
         }
 
-        private void PlayStrip_Load(object sender, EventArgs e) {
+        private void PlayStrip_Resize(object sender, EventArgs e) {
             if (isPlaceholder) return;
             if (Program.mainForm.WindowState == FormWindowState.Minimized) return;
             graph = new Bitmap(Width, Height);
             BackgroundImage = graph;
             //BackgroundImageLayout = ImageLayout.Stretch;
             DrawGraph(Progress);
-        }
-
-        private void PlayStrip_Resize(object sender, EventArgs e) {
-            PlayStrip_Load(sender, e);
         }
 
         private void bnFile_Click(object sender, EventArgs e) {
@@ -402,5 +420,9 @@ namespace SFXPlayer {
             }
         }
 
+        private void PlayStrip_MouseDown(object sender, MouseEventArgs e) {
+            //Debug.WriteLine("PlayStrip_MouseDown {0}", sender);
+            //DoDragDrop(this, DragDropEffects.Move | DragDropEffects.Scroll);
+        }
     }
 }

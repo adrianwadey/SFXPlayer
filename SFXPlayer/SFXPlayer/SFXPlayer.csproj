@@ -169,6 +169,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="FXPlayer.ico" />
     <Content Include="icudt.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -199,7 +200,7 @@
       <Visible>False</Visible>
       <Description>SFX Cue List</Description>
       <Progid>cues</Progid>
-      <DefaultIcon>Play.ico</DefaultIcon>
+      <DefaultIcon>FXPlayer.ico</DefaultIcon>
     </FileAssociation>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using AJW.General;
 using System.IO;
+using CSCore.Codecs;
 
 namespace SFXPlayer {
     public partial class Form1 : Form {
@@ -45,8 +46,10 @@ namespace SFXPlayer {
             }
         }
         private const int cueListSpacing = 35;
+        private readonly int PlayStripControlHeight = new PlayStrip().Height;
         private readonly ObservableCollection<MMDevice> _devices = new ObservableCollection<MMDevice>();
         public static Control lastFocused;
+        string[] filters;
 
         public Form1() {
             // Initialize Forms Designer generated code.
@@ -92,8 +95,14 @@ namespace SFXPlayer {
 
             // Listen for the SoundLocationChanged event.
             //player.SoundLocationChanged += new EventHandler(player_LocationChanged);
-        }
 
+            //set up list of file extensions for checking dragndrop files
+            filters = CodecFactory.SupportedFilesFilterEn.Split(new char[] { '|' });
+            filters = filters[1].Split(new char[] { ';' });
+            for (int i = 0; i < filters.Length; i++) {
+                filters[i] = filters[i].Substring(1).ToUpper();
+            }
+        }
 
         // Convenience method for setting message text in 
         // the status bar.
@@ -149,6 +158,7 @@ namespace SFXPlayer {
             Debug.WriteLine("MouseWheelScrollLines = " + SystemInformation.MouseWheelScrollLines);
 
             ShowFileHandler.FileTitleUpdate += UpdateTitleBar;
+            //Insert = new PlayStrip() { Width = 100, BackColor = Color.Blue, isPlaceholder = false };
             //get the sound devices
             using (var mmdeviceEnumerator = new MMDeviceEnumerator()) {
                 using (
@@ -294,8 +304,8 @@ namespace SFXPlayer {
         }
 
         void UpdateDisplayedIndexes() {
-                //renumber the cues
-                int Index = 1;
+            //renumber the cues
+            int Index = 1;
             foreach (Control ctl in CueList.Controls) {
                 if (ctl.GetType() == typeof(PlayStrip)) {
                     var ps = ctl as PlayStrip;
@@ -379,15 +389,15 @@ namespace SFXPlayer {
         }
 
         private void CueList_Scroll(object sender, ScrollEventArgs e) {
-            Debug.WriteLine("Scroll");
-            Debug.WriteLine("Type " + e.Type);
-            Debug.WriteLine("Orientation " + e.ScrollOrientation);
-            Debug.WriteLine("Old=" + e.OldValue);
-            Debug.WriteLine("New=" + e.NewValue);
-            Debug.WriteLine("Min " + CueList.VerticalScroll.Minimum);
-            Debug.WriteLine("Max " + CueList.VerticalScroll.Maximum);
-            Debug.WriteLine("Lg " + CueList.VerticalScroll.LargeChange);
-            Debug.WriteLine("Sm " + CueList.VerticalScroll.SmallChange);
+            //Debug.WriteLine("Scroll");
+            //Debug.WriteLine("Type " + e.Type);
+            //Debug.WriteLine("Orientation " + e.ScrollOrientation);
+            //Debug.WriteLine("Old=" + e.OldValue);
+            //Debug.WriteLine("New=" + e.NewValue);
+            //Debug.WriteLine("Min " + CueList.VerticalScroll.Minimum);
+            //Debug.WriteLine("Max " + CueList.VerticalScroll.Maximum);
+            //Debug.WriteLine("Lg " + CueList.VerticalScroll.LargeChange);
+            //Debug.WriteLine("Sm " + CueList.VerticalScroll.SmallChange);
             //((System.Windows.Forms.FlowLayoutPanel..ScrollBar)sender).Value = e.NewValue;
             //ReportStatus(
             //    "Type " + e.Type +
@@ -567,7 +577,7 @@ namespace SFXPlayer {
                 }
             }
         }
-                
+
         private void CueList_ControlAdded(object sender, ControlEventArgs e) {
             var ctl = e.Control as PlayStrip;
             if (ctl != null) ctl.StopAll += StopAll;
@@ -575,8 +585,10 @@ namespace SFXPlayer {
         }
 
         private void CueList_ControlRemoved(object sender, ControlEventArgs e) {
-            var ctl = e.Control as PlayStrip;
-            if (ctl != null) ctl.StopAll -= StopAll;
+            if (e.Control is PlayStrip ps) {
+                ps.Stop();
+                ps.StopAll -= StopAll;
+            }
             FocusUntrackLowestControls(e.Control);
         }
 
@@ -591,6 +603,195 @@ namespace SFXPlayer {
 
         private void stopAllToolStripMenuItem_Click(object sender, EventArgs e) {
             bnStopAll_Click(sender, e);
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Escape) {
+                bnStopAll_Click(sender, e);
+            }
+        }
+
+        private bool CheckAllFilesAreAudio(string[] files) {
+            bool FileOK;
+            foreach (string file in files) {
+                FileOK = false;
+                Console.WriteLine(file);
+                foreach (string filter in filters) {
+                    if (Path.GetExtension(file).ToUpper() == filter) {
+                        FileOK = true;
+                        break;
+                    }
+                }
+                if (!FileOK) {
+                    //Debug.WriteLine("Not all files are audio");
+                    return false;
+                }
+            }
+            //Debug.WriteLine("All files are audio");
+            return true;
+        }
+
+        //PlayStrip Insert;
+        PlayStrip LastHovered;
+        Color LastHoveredColor;
+        private void HighlightControl(int index) {
+            UnHighlightControl();
+            LastHovered = (PlayStrip)CueList.Controls[index + TOP_PLACEHOLDERS];
+            LastHoveredColor = LastHovered.BackColor;
+            LastHovered.BackColor = SystemColors.Highlight;
+        }
+
+        private void UnHighlightControl() {
+            if (LastHovered != null) {
+                LastHovered.BackColor = LastHoveredColor;
+                LastHovered = null;
+            }
+        }
+
+
+        /// <summary>True if data is suitable to drop on an existing control</summary>
+        bool ReplaceOK;
+        /// <summary>True if data is suitable to drop between existing controls</summary>
+        bool AddOK;
+
+        private void CueList_DragEnter(object sender, DragEventArgs e) {
+            ReplaceOK = AddOK = false;
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+                Debug.WriteLine("File(s) dragged");
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (CheckAllFilesAreAudio(files)) {
+                    AddOK = true;
+                    ReplaceOK = (files.Count() == 1);
+                }
+            } else if (e.Data.GetDataPresent(typeof(PlayStrip))) {
+                AddOK = true;
+            }
+        }
+
+        bool AddZone = false;
+        bool ReplaceZone = false;
+
+        private void CueList_DragOver(object sender, DragEventArgs e) {
+            AddZone = false;
+            ReplaceZone = false;
+
+            //find where we are
+            Point CueListMousePos = new Point(e.X - RectangleToScreen(ClientRectangle).Left - CueList.Left, e.Y - RectangleToScreen(ClientRectangle).Top - CueList.Top);
+            int Ypos = CueListMousePos.Y - CueList.AutoScrollPosition.Y;
+            
+            if (Ypos < TOP_PLACEHOLDERS * cueListSpacing) {                //in dead zone at top
+                AddZone = true;
+            } else if (Ypos > (TOP_PLACEHOLDERS + CurrentShow.Cues.Count) * cueListSpacing) {   //in dead zone at bottom
+                AddZone = true;
+            } else {
+                if ((Ypos % cueListSpacing) > PlayStripControlHeight) {
+                    AddZone = true;
+                } else {
+                    ReplaceZone = true;
+                }
+            }
+            //update the cursor
+            if (AddZone && AddOK) {
+                if (e.Data.GetDataPresent(typeof(PlayStrip))) {
+                    e.Effect = DragDropEffects.Move;
+                } else {
+                    e.Effect = DragDropEffects.Copy;
+                }
+            } else if (ReplaceZone && ReplaceOK) {
+                e.Effect = DragDropEffects.Move;
+            } else {
+                e.Effect = DragDropEffects.None;
+            }
+
+            //highlight the control
+            if (ReplaceZone && ReplaceOK) {
+                int index = Ypos / cueListSpacing - TOP_PLACEHOLDERS;
+                index = Math.Max(index, 0);
+                index = Math.Min(index, CurrentShow.Cues.Count);
+                if (CueList.Controls[index + TOP_PLACEHOLDERS] != LastHovered) {
+                    HighlightControl(index);
+                }
+            } else {
+                UnHighlightControl();
+            }
+        }
+
+        private void CueList_DragLeave(object sender, EventArgs e) {
+            UnHighlightControl();
+        }
+
+        private void CueList_DragDrop(object sender, DragEventArgs e) {
+            Point CueListMousePos = new Point(e.X - RectangleToScreen(ClientRectangle).Left - CueList.Left, e.Y - RectangleToScreen(ClientRectangle).Top - CueList.Top);
+            int index = (CueListMousePos.Y - CueList.AutoScrollPosition.Y) / cueListSpacing - TOP_PLACEHOLDERS + 1;
+            index = Math.Max(index, 0);
+            index = Math.Min(index, CurrentShow.Cues.Count);
+
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+                Debug.WriteLine("File(s) dropped");
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (LastHovered != null) {
+                    //we're over a PlayStrip and there's only one file
+                    string msg = "do you wish to replace the file" + Environment.NewLine;
+                    msg += LastHovered.SFX.ShortFileName + Environment.NewLine;
+                    msg += "with" + Environment.NewLine;
+                    msg += Path.GetFileName(files[0]) + Environment.NewLine;
+                    msg += "in cue " + LastHovered.Index.ToString("D3") + "?" + Environment.NewLine;
+                    if (string.IsNullOrEmpty(LastHovered.SFX.FileName) ||
+                        MessageBox.Show(msg, "Replace File", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK) {
+                        Debug.WriteLine("replacing file at index {0}", LastHovered.Index);
+                        LastHovered.SetFile(files[0]);
+                        //LastHovered.PreloadFile(this, new EventArgs());
+                        LastHovered = null;     //backcolor reset by loading above
+                    } else {
+                        UnHighlightControl();
+                    }
+                } else if (AddZone) {
+                    //insert new cue for each file
+                    //foreach (string file in files) Console.WriteLine(file);
+                    //Debug.WriteLine("Inserting {0} cues starting at index {1}", files.Count(), index + 1);
+                    foreach (string file in files) {
+                        SFX sfx = new SFX { FileName = file };
+                        PlayStrip ps = new PlayStrip(sfx) { Width = CueList.ClientSize.Width };
+                        CueList.Controls.Add(ps);
+                        CueList.Controls.SetChildIndex(ps, paddedTop + index);
+                        ps.SetFile(file);
+                        //ps.PreloadFile(this, new EventArgs());
+                        CurrentShow.AddCue(sfx, index++);
+                    }
+                    PadCueList();
+                    NextPlayCueChanged();
+                }
+            } else if (e.Data.GetDataPresent(typeof(PlayStrip))) {
+                if (AddZone) {
+                    PlayStrip ps = ((PlayStrip)e.Data.GetData(typeof(PlayStrip)));
+                    int src = ps.Index - 1;
+                    int dest = index;
+                    if (dest > src) dest--;
+                    if (dest == src) {
+                        Debug.WriteLine("Not moving");
+                        return;
+                    }
+                    Debug.WriteLine("Moving PlayStrip[{0}] to index {1}", src, dest);
+                    CurrentShow.Cues.Move(src, dest);
+                    CueList.Controls.SetChildIndex(ps, dest + paddedTop);
+                    Width += 1;     //fudge to force a redraw. The proper routes don't seem to work
+                    Width -= 1;     //this doesn;t work when maximized
+                }
+            }
+        }
+
+        //don't think this gets hit!
+        private void CueList_MouseDown(object sender, MouseEventArgs e) {
+            Point CueListMousePos = new Point(e.X - RectangleToScreen(ClientRectangle).Left - CueList.Left, e.Y - RectangleToScreen(ClientRectangle).Top - CueList.Top);
+            Control selectedControl = CueList.GetChildAtPoint(CueListMousePos);
+            Debug.WriteLine("CueList_MouseDown");
+            if (selectedControl != null) {
+                if (selectedControl.GetType() == typeof(PlayStrip)) {
+                    DoDragDrop(selectedControl, DragDropEffects.Move | DragDropEffects.Scroll);
+                } else {
+                    Debug.WriteLine("Drag control was {0}", selectedControl.ToString());
+                }
+            }
         }
     }
 }
