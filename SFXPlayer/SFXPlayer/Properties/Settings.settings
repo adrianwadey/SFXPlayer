@@ -29,5 +29,8 @@
     <Setting Name="ArchiveFolder" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="ColourPreview" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">DarkOrange</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

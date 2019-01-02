@@ -130,5 +130,17 @@ namespace SFXPlayer.Properties {
                 this["ArchiveFolder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DarkOrange")]
+        public global::System.Drawing.Color ColourPreview {
+            get {
+                return ((global::System.Drawing.Color)(this["ColourPreview"]));
+            }
+            set {
+                this["ColourPreview"] = value;
+            }
+        }
     }
 }

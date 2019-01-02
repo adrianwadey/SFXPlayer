@@ -33,7 +33,10 @@
             this.bnFile = new System.Windows.Forms.Button();
             this.bnVolume = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.previewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
+            this.contextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -72,7 +75,7 @@
             this.lbIndex.TabIndex = 0;
             this.lbIndex.Text = "000";
             this.lbIndex.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lbIndex.DoubleClick += new System.EventHandler(this.label1_DoubleClick);
+            this.lbIndex.DoubleClick += new System.EventHandler(this.lbIndex_DoubleClick);
             // 
             // tbDescription
             // 
@@ -116,7 +119,7 @@
             this.bnStopAll.TabIndex = 4;
             this.toolTip1.SetToolTip(this.bnStopAll, "Stop All Other Sounds");
             this.bnStopAll.UseVisualStyleBackColor = true;
-            this.bnStopAll.CheckedChanged += new System.EventHandler(this.cbLoop_CheckedChanged);
+            this.bnStopAll.CheckedChanged += new System.EventHandler(this.bnStopAll_CheckedChanged);
             // 
             // bnFile
             // 
@@ -140,20 +143,38 @@
             this.bnVolume.Click += new System.EventHandler(this.bnVolume_Click);
             this.bnVolume.Enter += new System.EventHandler(this.bnVolume_Enter);
             // 
+            // contextMenu
+            // 
+            this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.previewToolStripMenuItem});
+            this.contextMenu.Name = "contextMenuStrip1";
+            this.contextMenu.Size = new System.Drawing.Size(116, 26);
+            this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
+            // 
+            // previewToolStripMenuItem
+            // 
+            this.previewToolStripMenuItem.Name = "previewToolStripMenuItem";
+            this.previewToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.previewToolStripMenuItem.Text = "&Preview";
+            this.previewToolStripMenuItem.Click += new System.EventHandler(this.previewToolStripMenuItem_Click);
+            // 
             // PlayStrip
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.ContextMenuStrip = this.contextMenu;
             this.Controls.Add(this.tableLayoutPanel1);
             this.DoubleBuffered = true;
+            this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "PlayStrip";
             this.Size = new System.Drawing.Size(386, 27);
             this.Load += new System.EventHandler(this.PlayStrip_Load);
-            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PlayStrip_MouseDown);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MouseDownHandler);
             this.Resize += new System.EventHandler(this.PlayStrip_Resize);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            this.contextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -169,5 +190,7 @@
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button bnFile;
         private System.Windows.Forms.Button bnVolume;
+        private System.Windows.Forms.ContextMenuStrip contextMenu;
+        private System.Windows.Forms.ToolStripMenuItem previewToolStripMenuItem;
     }
 }

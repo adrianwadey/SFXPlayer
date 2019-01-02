@@ -26,7 +26,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.statusBar = new System.Windows.Forms.StatusBar();
-            this.CueList = new System.Windows.Forms.Panel();
+            this.CueList = new System.Windows.Forms.TableLayoutPanel();
             this.dlgOpenAudioFile = new System.Windows.Forms.OpenFileDialog();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.rtMainText = new System.Windows.Forms.RichTextBox();
@@ -55,6 +55,10 @@
             this.ScrollTimer = new System.Windows.Forms.Timer(this.components);
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.bnPrev = new System.Windows.Forms.Button();
+            this.bnNext = new System.Windows.Forms.Button();
+            this.rtPrevMainText = new System.Windows.Forms.RichTextBox();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -62,7 +66,7 @@
             // 
             this.statusBar.Location = new System.Drawing.Point(0, 428);
             this.statusBar.Name = "statusBar";
-            this.statusBar.Size = new System.Drawing.Size(800, 22);
+            this.statusBar.Size = new System.Drawing.Size(861, 22);
             this.statusBar.SizingGrip = false;
             this.statusBar.TabIndex = 9;
             this.statusBar.Text = "(no status)";
@@ -75,9 +79,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.CueList.AutoScroll = true;
             this.CueList.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.CueList.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 483F));
             this.CueList.Location = new System.Drawing.Point(305, 27);
             this.CueList.Name = "CueList";
-            this.CueList.Size = new System.Drawing.Size(482, 401);
+            this.CueList.Size = new System.Drawing.Size(556, 401);
             this.CueList.TabIndex = 4;
             this.CueList.Scroll += new System.Windows.Forms.ScrollEventHandler(this.CueList_Scroll);
             this.CueList.ClientSizeChanged += new System.EventHandler(this.CueList_ClientSizeChanged);
@@ -96,7 +101,7 @@
             // comboBox1
             // 
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(12, 127);
+            this.comboBox1.Location = new System.Drawing.Point(345, 3);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(183, 21);
             this.comboBox1.TabIndex = 9;
@@ -113,7 +118,7 @@
             // comboBox2
             // 
             this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(12, 172);
+            this.comboBox2.Location = new System.Drawing.Point(655, 3);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(183, 21);
             this.comboBox2.TabIndex = 8;
@@ -122,17 +127,18 @@
             // 
             this.bnStopAll.BackColor = System.Drawing.Color.Red;
             this.bnStopAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bnStopAll.Location = new System.Drawing.Point(93, 27);
+            this.bnStopAll.Location = new System.Drawing.Point(12, 142);
             this.bnStopAll.Name = "bnStopAll";
             this.bnStopAll.Size = new System.Drawing.Size(177, 81);
             this.bnStopAll.TabIndex = 17;
             this.bnStopAll.Text = "STOP";
+            this.toolTip1.SetToolTip(this.bnStopAll, "Esc");
             this.bnStopAll.UseVisualStyleBackColor = false;
             this.bnStopAll.Click += new System.EventHandler(this.bnStopAll_Click);
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(12, 27);
+            this.button2.Location = new System.Drawing.Point(207, 1);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 1;
@@ -150,7 +156,8 @@
             this.bnPlayNext.Name = "bnPlayNext";
             this.bnPlayNext.Size = new System.Drawing.Size(48, 21);
             this.bnPlayNext.TabIndex = 3;
-            this.bnPlayNext.Text = "&Play >";
+            this.bnPlayNext.Text = "&Play ˃";
+            this.toolTip1.SetToolTip(this.bnPlayNext, "F5");
             this.bnPlayNext.UseVisualStyleBackColor = true;
             this.bnPlayNext.Click += new System.EventHandler(this.bnPlayNext_Click);
             // 
@@ -180,10 +187,11 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.transportToolStripMenuItem});
+            this.transportToolStripMenuItem,
+            this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(800, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(861, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -280,7 +288,7 @@
             // 
             this.playToolStripMenuItem.Name = "playToolStripMenuItem";
             this.playToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.playToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.playToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.playToolStripMenuItem.Text = "&Play";
             this.playToolStripMenuItem.Click += new System.EventHandler(this.playToolStripMenuItem_Click);
             // 
@@ -288,7 +296,7 @@
             // 
             this.stopAllToolStripMenuItem.Name = "stopAllToolStripMenuItem";
             this.stopAllToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.stopAllToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.stopAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.stopAllToolStripMenuItem.Text = "Stop &All";
             this.stopAllToolStripMenuItem.Click += new System.EventHandler(this.stopAllToolStripMenuItem_Click);
             // 
@@ -300,7 +308,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 111);
+            this.label1.Location = new System.Drawing.Point(288, 6);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(51, 13);
             this.label1.TabIndex = 24;
@@ -309,18 +317,56 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 156);
+            this.label2.Location = new System.Drawing.Point(534, 6);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(115, 13);
             this.label2.TabIndex = 25;
             this.label2.Text = "Preview (Headphones)";
+            // 
+            // bnPrev
+            // 
+            this.bnPrev.Location = new System.Drawing.Point(256, 146);
+            this.bnPrev.Name = "bnPrev";
+            this.bnPrev.Size = new System.Drawing.Size(23, 23);
+            this.bnPrev.TabIndex = 26;
+            this.bnPrev.Text = "˄";
+            this.bnPrev.UseVisualStyleBackColor = true;
+            this.bnPrev.Click += new System.EventHandler(this.bnPrev_Click);
+            // 
+            // bnNext
+            // 
+            this.bnNext.Location = new System.Drawing.Point(256, 199);
+            this.bnNext.Name = "bnNext";
+            this.bnNext.Size = new System.Drawing.Size(23, 23);
+            this.bnNext.TabIndex = 27;
+            this.bnNext.Text = "˅";
+            this.bnNext.UseVisualStyleBackColor = true;
+            this.bnNext.Click += new System.EventHandler(this.bnNext_Click);
+            // 
+            // rtPrevMainText
+            // 
+            this.rtPrevMainText.Location = new System.Drawing.Point(12, 34);
+            this.rtPrevMainText.Name = "rtPrevMainText";
+            this.rtPrevMainText.Size = new System.Drawing.Size(287, 102);
+            this.rtPrevMainText.TabIndex = 28;
+            this.rtPrevMainText.Text = "";
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "Help";
+            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
             // Form1
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(861, 450);
+            this.Controls.Add(this.rtPrevMainText);
+            this.Controls.Add(this.bnNext);
+            this.Controls.Add(this.bnPrev);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.bnDeleteCue);
@@ -338,11 +384,13 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
-            this.MinimumSize = new System.Drawing.Size(816, 489);
+            this.MinimumSize = new System.Drawing.Size(877, 489);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.toolTip1.SetToolTip(this, "Playback");
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.Form1_ControlAdded);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.Resize += new System.EventHandler(this.Form1_Resize);
             this.menuStrip1.ResumeLayout(false);
@@ -354,7 +402,7 @@
 
         #endregion
         private System.Windows.Forms.StatusBar statusBar;
-        private System.Windows.Forms.Panel CueList;
+        private System.Windows.Forms.TableLayoutPanel CueList;
         private System.Windows.Forms.OpenFileDialog dlgOpenAudioFile;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.RichTextBox rtMainText;
@@ -383,6 +431,10 @@
         private System.Windows.Forms.ToolStripMenuItem transportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem playToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem stopAllToolStripMenuItem;
+        private System.Windows.Forms.Button bnPrev;
+        private System.Windows.Forms.Button bnNext;
+        private System.Windows.Forms.RichTextBox rtPrevMainText;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
     }
 }
 

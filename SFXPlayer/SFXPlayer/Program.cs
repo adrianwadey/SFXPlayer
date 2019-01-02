@@ -11,14 +11,15 @@ namespace SFXPlayer {
         /// </summary>
         [STAThread]
         static void Main() {
-            //FocusTracker focusTracker = new FocusTracker();
-            Properties.Settings.Default.Upgrade();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Application.AddMessageFilter(focusTracker);
+            SplashScreen ss = new SplashScreen();
+            ss.Show();
+
+            Properties.Settings.Default.Upgrade();
+
             mainForm = new Form1();
             Application.Run(mainForm);
-            //Application.RemoveMessageFilter(focusTracker);
         }
 
         public static Form1 mainForm;

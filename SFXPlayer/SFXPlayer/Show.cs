@@ -65,11 +65,11 @@ namespace SFXPlayer {
             }
             OnUpdateShow();
             OnShowFileBecameDirty();            //Dirty = true; need to set it in filehandler
-            Debug.WriteLine(e.Action);
-            Debug.WriteLine("OldItems (" + e.OldItems?.Count + ") " + e.OldItems);
-            Debug.WriteLine("NewItems (" + e.NewItems?.Count + ") " + e.NewItems);
-            Debug.WriteLine("OldStartingIndex " + e.OldStartingIndex);
-            Debug.WriteLine("NewStartingIndex " + e.NewStartingIndex);
+            //Debug.WriteLine(e.Action);
+            //Debug.WriteLine("OldItems (" + e.OldItems?.Count + ") " + e.OldItems);
+            //Debug.WriteLine("NewItems (" + e.NewItems?.Count + ") " + e.NewItems);
+            //Debug.WriteLine("OldStartingIndex " + e.OldStartingIndex);
+            //Debug.WriteLine("NewStartingIndex " + e.NewStartingIndex);
         }
 
         private void OnShowFileBecameDirty() {
@@ -84,17 +84,9 @@ namespace SFXPlayer {
             Cues.Move(fromIndex, toIndex);
         }
 
-        internal DialogResult DeleteCue(int Index) {
-            DialogResult Response = MessageBox.Show("Delete Cue?" + Environment.NewLine + Cues[Index].Description, "Cue List", MessageBoxButtons.YesNo);
-            if (Response == DialogResult.Yes) {
-                Cues.RemoveAt(Index);
-            }
-            return Response;
-        }
-
         internal string CreateArchive(string CurrentFileName) {
             string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            string tempArchiveFileName = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(CurrentFileName) + ".zip");
+            string tempArchiveFileName = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(CurrentFileName) + ".show");
             Directory.CreateDirectory(tempDirectory);
             Program.mainForm.ReportStatus("Creating Archive: Copying files");
             //get a list of the sound files
@@ -148,28 +140,9 @@ namespace SFXPlayer {
             }
             return "";
         }
-    }
 
-    public class ShowChangeArgs : EventArgs {
-        enum ShowChangeType {
-            Add, Move, Remove, Replace
-
+        internal void RemoveCue(SFX sfx) {
+            Cues.Remove(sfx);
         }
-
-        private string message;
-
-        public ShowChangeArgs(string message) {
-            this.message = message;
-        }
-
-        // This is a straightforward implementation for 
-        // declaring a public field
-        public string Message {
-            get {
-                return message;
-            }
-        }
-    }
-    public class NotifyShowChanged {
     }
 }

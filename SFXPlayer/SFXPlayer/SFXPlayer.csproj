@@ -28,8 +28,8 @@
     <ProductName>SFX Launcher</ProductName>
     <PublisherName>Adrian Wadey</PublisherName>
     <SuiteName>SFX</SuiteName>
-    <ApplicationRevision>5</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>1.1.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -78,15 +78,6 @@
     <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL">
       <HintPath>..\packages\CSCore.1.2.1.2\lib\net35-client\CSCore.dll</HintPath>
     </Reference>
-    <Reference Include="Patagames.Pdf, Version=3.49.20.47, Culture=neutral, PublicKeyToken=60fd6cf9b15941cf, processorArchitecture=MSIL">
-      <HintPath>..\packages\Pdfium.Net.SDK.3.44.2704\lib\net47\Patagames.Pdf.dll</HintPath>
-    </Reference>
-    <Reference Include="Patagames.Pdf.WinForms, Version=3.15.13.47, Culture=neutral, PublicKeyToken=60fd6cf9b15941cf, processorArchitecture=MSIL">
-      <HintPath>..\packages\Pdfium.Net.SDK.3.44.2704\lib\net47\Patagames.Pdf.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="Patagames.Pdf.Wpf, Version=3.16.14.47, Culture=neutral, PublicKeyToken=60fd6cf9b15941cf, processorArchitecture=MSIL">
-      <HintPath>..\packages\Pdfium.Net.SDK.3.44.2704\lib\net47\Patagames.Pdf.Wpf.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
@@ -122,6 +113,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SFX.cs" />
     <Compile Include="Show.cs" />
+    <Compile Include="Spacer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Spacer.Designer.cs">
+      <DependentUpon>Spacer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SplashScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SplashScreen.Designer.cs">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+    </Compile>
     <Compile Include="ucVolume.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -132,7 +135,6 @@
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Pdf.Net.SDK.licx" />
     <EmbeddedResource Include="PlayStrip.resx">
       <DependentUpon>PlayStrip.cs</DependentUpon>
     </EmbeddedResource>
@@ -146,6 +148,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Spacer.resx">
+      <DependentUpon>Spacer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SplashScreen.resx">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ucVolume.resx">
       <DependentUpon>ucVolume.cs</DependentUpon>
     </EmbeddedResource>
@@ -170,18 +178,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FXPlayer.ico" />
-    <Content Include="icudt.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <None Include="FXPlayerIconCircularLight.png" />
     <Content Include="Play.ico" />
     <Content Include="Play.png" />
     <Content Include="Stop.png" />
-    <Content Include="x64\pdfium.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="x86\pdfium.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
@@ -200,6 +200,12 @@
       <Visible>False</Visible>
       <Description>SFX Cue List</Description>
       <Progid>cues</Progid>
+      <DefaultIcon>FXPlayer.ico</DefaultIcon>
+    </FileAssociation>
+    <FileAssociation Include=".show">
+      <Visible>False</Visible>
+      <Description>Compressed SFX Show Archive</Description>
+      <Progid>show</Progid>
       <DefaultIcon>FXPlayer.ico</DefaultIcon>
     </FileAssociation>
   </ItemGroup>
