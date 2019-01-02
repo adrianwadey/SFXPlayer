@@ -1,11 +1,14 @@
 # SFXPlayer
 ## Windows Sound Effects Launcher ##
 
-![Screenshot](SFXPlayer/SFXPlayer/SFXPlayer.PNG)
+![SplashScreen](SFXPlayer/SFXPlayer/SplashScreen.PNG)
+
 
 by Adrian Wadey
 
 Latest release 1.1.0.1
+
+![Screenshot](SFXPlayer/SFXPlayer/SFXPlayer.PNG)
 
 Sound Effects Player for theatrical use.
 
