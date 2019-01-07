@@ -142,5 +142,53 @@ namespace SFXPlayer.Properties {
                 this["ColourPreview"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoLoadLastSession {
+            get {
+                return ((bool)(this["AutoLoadLastSession"]));
+            }
+            set {
+                this["AutoLoadLastSession"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastSession {
+            get {
+                return ((string)(this["LastSession"]));
+            }
+            set {
+                this["LastSession"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastPreviewDevice {
+            get {
+                return ((string)(this["LastPreviewDevice"]));
+            }
+            set {
+                this["LastPreviewDevice"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastPlaybackDevice {
+            get {
+                return ((string)(this["LastPlaybackDevice"]));
+            }
+            set {
+                this["LastPlaybackDevice"] = value;
+            }
+        }
     }
 }

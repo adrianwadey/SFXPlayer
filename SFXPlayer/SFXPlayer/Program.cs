@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,8 +15,9 @@ namespace SFXPlayer {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             SplashScreen ss = new SplashScreen();
+#if !DEBUG
             ss.Show();
-
+#endif  
             Properties.Settings.Default.Upgrade();
 
             mainForm = new Form1();

@@ -22,6 +22,7 @@ namespace SFXPlayer {
         const int TOPPLACEHOLDER = -1;
         const int BOTTOMPLACEHOLDER = -2;
         const string FileExtensions = "Show Files (*.sfx)|*.sfx";
+        private bool InitialisingDevices = false;
         private XMLFileHandler<Show> ShowFileHandler = new XMLFileHandler<Show>();
         private Show _CurrentShow;
         private Show CurrentShow {
@@ -51,7 +52,8 @@ namespace SFXPlayer {
         private readonly int PlayStripControlHeight = new PlayStrip().Height;
         private readonly int SpacerControlHeight = new Spacer().Height;
         private readonly int TOPGAP = 5 * (new PlayStrip().Height + new Spacer().Height);
-        private readonly ObservableCollection<MMDevice> _devices = new ObservableCollection<MMDevice>();
+        private readonly ObservableCollection<MMDevice> PlayDevices = new ObservableCollection<MMDevice>();
+        private readonly ObservableCollection<MMDevice> PreviewDevices = new ObservableCollection<MMDevice>();
         public static Control lastFocused;
         string[] filters;
 
@@ -92,8 +94,8 @@ namespace SFXPlayer {
             rtMainText.Top = bnStopAll.Bottom + rtMainText.Margin.Top + bnStopAll.Margin.Bottom;
             rtMainText.Height = Math.Min(statusBar.Top - rtMainText.Margin.Bottom - rtMainText.Top, rtPrevMainText.Height);
             PlayStrip.OFD = dlgOpenAudioFile;
-            PlayStrip.Devices = comboBox1;
-            PlayStrip.PreviewDevices = comboBox2;
+            PlayStrip.Devices = cbPlayback;
+            PlayStrip.PreviewDevices = cbPreview;
         }
 
         // Sets up the SoundPlayer object.
@@ -203,23 +205,59 @@ namespace SFXPlayer {
                 using (
                     var mmdeviceCollection = mmdeviceEnumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active)) {
                     foreach (var device in mmdeviceCollection) {
-                        _devices.Add(device);
+                        PlayDevices.Add(device);
+                        PreviewDevices.Add(device);
                     }
                 }
             }
             //Normal playback device
-            comboBox1.DataSource = _devices;
-            comboBox1.DisplayMember = "FriendlyName";
-            comboBox1.ValueMember = "DeviceID";
+            InitialisingDevices = true;
+            cbPlayback.DataSource = PlayDevices;
+            cbPlayback.DisplayMember = "FriendlyName";
+            cbPlayback.ValueMember = "DeviceID";
+            MMDevice mmDev = PlayDevices.Where(dev => dev.FriendlyName == Settings.Default.LastPlaybackDevice).FirstOrDefault();
+            if(mmDev != null) {
+                if (cbPlayback.Items.Contains(mmDev)) {
+                    Debug.WriteLine("found");
+                    cbPlayback.SelectedItem = mmDev;
+                }
+            } else {
+                Debug.WriteLine("not found " + Settings.Default.LastPlaybackDevice);
+            }
+            Debug.WriteLine(((MMDevice)cbPlayback.SelectedItem).DeviceFormat.ToString());
+            
 
             //Preview playback device
-            comboBox2.DataSource = _devices;
-            comboBox2.DisplayMember = "FriendlyName";
-            comboBox2.ValueMember = "DeviceID";
-
+            cbPreview.DataSource = PreviewDevices;
+            cbPreview.DisplayMember = "FriendlyName";
+            cbPreview.ValueMember = "DeviceID";
+            mmDev = PreviewDevices.Where(dev => dev.FriendlyName == Settings.Default.LastPreviewDevice).FirstOrDefault();
+            if (mmDev != null) {
+                if (cbPreview.Items.Contains(mmDev)) {
+                    Debug.WriteLine("found");
+                    cbPreview.SelectedItem = mmDev;
+                }
+            } else {
+                Debug.WriteLine("not found " + Settings.Default.LastPreviewDevice);
+            }
+            InitialisingDevices = false;
 
             ProgressTimer.Enabled = true;
+            string[] args = Environment.GetCommandLineArgs();
+            foreach (string cmd in args) {
+                Debug.WriteLine(cmd);
+            }
             FileNew();
+            if (args.Length == 2) {
+                Show newShow;
+                newShow = ShowFileHandler.LoadFromFile(args[1]);
+                if (newShow != null) {
+                    int tempNextPlayCueIndex = newShow.NextPlayCueIndex;
+                    CurrentShow = newShow;
+                    NextPlayCueIndex = tempNextPlayCueIndex;
+                }
+            }
+
             ResetDisplay();
 
             //Form1_Resize(this, new EventArgs());
@@ -345,6 +383,7 @@ namespace SFXPlayer {
         }
 
         void ResetDisplay() {
+            ShowFileHandler.PushDirty();
             CueList.SuspendLayout();
             CueList.Controls.Clear();
             CueList.RowStyles.Clear();
@@ -360,8 +399,10 @@ namespace SFXPlayer {
             CueList.RowCount++;
             CueList.Controls.Add(sp, 0, 1);
 
-            foreach (SFX sfx in CurrentShow.Cues) {
-                AddPlaystrip(sfx, CurrentShow.Cues.IndexOf(sfx));
+            if (CurrentShow != null) {
+                foreach (SFX sfx in CurrentShow.Cues) {
+                    AddPlaystrip(sfx, CurrentShow.Cues.IndexOf(sfx));
+                }
             }
 
             sp = new Spacer { Width = CueList.ClientSize.Width, Name = "Bottom" };
@@ -371,10 +412,14 @@ namespace SFXPlayer {
 
             CueList.ResumeLayout();
             PadCueList();
-            NextPlayCueChanged();
+            if (CurrentShow != null) {
+                NextPlayCueChanged();
+            }
 
             CueList.VerticalScroll.SmallChange = CueListSpacing;
             CueList.VerticalScroll.LargeChange = 3 * CueList.VerticalScroll.SmallChange;
+            ShowFileHandler.PopDirty();
+            UpdateTitleBar(this, new EventArgs());
         }
 
         /// <summary>
@@ -966,6 +1011,34 @@ namespace SFXPlayer {
             MessageBox.Show("It is recommended to disable system sounds\r\n" +
                             "right click on the windows speaker icon and choose \"Sounds\"\r\n" +
                             "then choose Sound Scheme: No Sounds", Application.ProductName);
+        }
+
+        private void cbPlayback_SelectedIndexChanged(object sender, EventArgs e) {
+            if (InitialisingDevices) return;
+            Settings.Default.LastPlaybackDevice = ((MMDevice)cbPlayback.SelectedItem).FriendlyName;
+            Settings.Default.Save();
+            Debug.WriteLine(Settings.Default.LastPlaybackDevice);
+            ResetDisplay();
+        }
+
+        private void autoLoadLastsfxCuelistToolStripMenuItem_Click(object sender, EventArgs e) {
+            Settings.Default.AutoLoadLastSession = autoLoadLastsfxCuelistToolStripMenuItem.Checked;
+            Settings.Default.Save();
+        }
+
+        private void cbPreview_SelectedIndexChanged(object sender, EventArgs e) {
+            if (InitialisingDevices) return;
+            Settings.Default.LastPreviewDevice = ((MMDevice)cbPreview.SelectedItem).FriendlyName;
+            Settings.Default.Save();
+            Debug.WriteLine(Settings.Default.LastPreviewDevice);
+        }
+
+        private void previousCueToolStripMenuItem_Click(object sender, EventArgs e) {
+            bnPrev_Click(sender, e);
+        }
+
+        private void nextCueToolStripMenuItem_Click(object sender, EventArgs e) {
+            bnNext_Click(sender, e);
         }
     }
 }

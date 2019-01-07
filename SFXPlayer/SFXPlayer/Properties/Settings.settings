@@ -32,5 +32,17 @@
     <Setting Name="ColourPreview" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">DarkOrange</Value>
     </Setting>
+    <Setting Name="AutoLoadLastSession" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="LastSession" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LastPreviewDevice" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LastPlaybackDevice" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

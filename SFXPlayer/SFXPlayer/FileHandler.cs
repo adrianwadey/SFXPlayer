@@ -141,5 +141,14 @@ namespace AJW.General {
             }
         }
 
+        Stack<bool> DirtyStack = new Stack<bool>();
+
+        internal void PushDirty() {
+            DirtyStack.Push(Dirty);
+        }
+
+        internal void PopDirty() {
+            Dirty = DirtyStack.Pop();
+        }
     }
 }

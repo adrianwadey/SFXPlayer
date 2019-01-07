@@ -13,11 +13,13 @@ using System.Diagnostics;
 
 namespace SFXPlayer {
     enum PlayerState {
+        error = -1,
         uninitialised = PlaybackState.Stopped,
         play = PlaybackState.Playing,
         paused = PlaybackState.Paused,
         loading = 3,
         loaded = 4,
+
     }
 
     public partial class PlayStrip : UserControl {
@@ -134,6 +136,9 @@ namespace SFXPlayer {
                 case PlayerState.paused:
                     BackColor = Settings.Default.ColourPlayerPaused;
                     break;
+                case PlayerState.error:
+                    BackColor = Color.Red;
+                    break;
                 default:
                     BackColor = Settings.Default.ColourPlayerIdle;
                     break;
@@ -181,6 +186,8 @@ namespace SFXPlayer {
         private void UpdateFileToolTip() {
             if (string.IsNullOrEmpty(SFX.FileName)) {
                 toolTip1.SetToolTip(bnFile, "Select File");
+            } else if (!File.Exists(SFX.FileName)) {
+                toolTip1.SetToolTip(bnFile, "File not found: " + SFX.ShortFileName);
             } else {
                 toolTip1.SetToolTip(bnFile, SFX.ShortFileName);
             }
@@ -220,6 +227,9 @@ namespace SFXPlayer {
 
         private void LoadFile() {
             if (string.IsNullOrEmpty(SFX.FileName)) return;
+            if (!File.Exists(SFX.FileName)) {
+                PlayerState = PlayerState.error;
+            }
             if (!File.Exists(SFX.FileName)) {
                 Program.mainForm.ReportStatus("File not found: " + SFX.FileName);
                 Debug.WriteLine("File not found: " + Path.GetFullPath(SFX.FileName));

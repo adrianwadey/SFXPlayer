@@ -70,6 +70,7 @@ namespace AudioPlayerSample {
 
         public void Play() {
             if (_soundOut != null)
+                _soundOut.Initialize(_waveSource);
                 _soundOut.Play();
         }
 
