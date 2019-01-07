@@ -1,7 +1,7 @@
 # SFXPlayer
 ## Windows Sound Effects Launcher ##
 
-![SplashScreen](SFXPlayer/SFXPlayer/SplashScreen.PNG)
+![SplashScreen](SFXPlayer/SFXPlayer/SplashScreen.png)
 
 
 by Adrian Wadey
@@ -22,11 +22,11 @@ previous cue (the one playing) and the selected cue
 *    Check the Stop All check box on the right if you want this cue to stop all others
 *    Check the Stop All check box without adding a sound to add a "Stop" cue
 *    Each cue also has individual play/stop buttons
-*    roght click on a cue to play it through headphones (assumes you have a separate USB 
+*    Right click on a cue to play it through headphones (assumes you have a separate USB 
 audio device for the main output)
-*    drag audio files onto the cue list to insert new cues
-*    drag a single audio file onto a cue to replace the current audio file
-*    drag cues around to reorder them
+*    Drag audio files onto the cue list to insert new cues
+*    Drag a single audio file onto a cue to replace the current audio file
+*    Drag cues around to reorder them
 *    Export Show will create a zip file with all the audio and the sfx file
 *    Import Show will decompress a ZIP file and load the sfx file
 
