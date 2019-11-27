@@ -22,9 +22,14 @@ namespace SFXPlayer {
         [DefaultValue("")] public string MainText { get { return _MainText; } set { _MainText = value; SFXBecameDirty?.Invoke(); } }
         [DefaultValue(50)] public int Volume { get { return _Volume; } set { _Volume = value; SFXBecameDirty?.Invoke(); } }
 
-        public string ShortFileName {
+        public string ShortFileNameOnly {
             get {
                 return Path.GetFileNameWithoutExtension(FileName);
+            }
+        }
+        public string ShortFileName {
+            get {
+                return Path.GetFileName(FileName);
             }
         }
 

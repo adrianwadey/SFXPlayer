@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 namespace SFXPlayer {
     public partial class Spacer : UserControl {
+        public Delegate bl;
         public Spacer() {
             InitializeComponent();
         }

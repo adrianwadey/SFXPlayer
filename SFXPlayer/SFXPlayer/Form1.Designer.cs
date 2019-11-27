@@ -25,14 +25,12 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.statusBar = new System.Windows.Forms.StatusBar();
             this.CueList = new System.Windows.Forms.TableLayoutPanel();
             this.dlgOpenAudioFile = new System.Windows.Forms.OpenFileDialog();
             this.cbPlayback = new System.Windows.Forms.ComboBox();
             this.rtMainText = new System.Windows.Forms.RichTextBox();
             this.cbPreview = new System.Windows.Forms.ComboBox();
             this.bnStopAll = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
             this.ProgressTimer = new System.Windows.Forms.Timer(this.components);
             this.bnPlayNext = new System.Windows.Forms.Button();
             this.bnAddCue = new System.Windows.Forms.Button();
@@ -52,10 +50,12 @@
             this.transportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.playToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.previousCueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nextCueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autoLoadLastsfxCuelistToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.playbackDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.previewDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuPreloadAll = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ScrollTimer = new System.Windows.Forms.Timer(this.components);
             this.label1 = new System.Windows.Forms.Label();
@@ -63,19 +63,15 @@
             this.bnPrev = new System.Windows.Forms.Button();
             this.bnNext = new System.Windows.Forms.Button();
             this.rtPrevMainText = new System.Windows.Forms.RichTextBox();
-            this.previousCueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.nextCueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // statusBar
-            // 
-            this.statusBar.Location = new System.Drawing.Point(0, 428);
-            this.statusBar.Name = "statusBar";
-            this.statusBar.Size = new System.Drawing.Size(861, 22);
-            this.statusBar.SizingGrip = false;
-            this.statusBar.TabIndex = 9;
-            this.statusBar.Text = "(no status)";
             // 
             // CueList
             // 
@@ -144,29 +140,20 @@
             this.bnStopAll.UseVisualStyleBackColor = false;
             this.bnStopAll.Click += new System.EventHandler(this.bnStopAll_Click);
             // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(207, 1);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "Preload";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
             // ProgressTimer
             // 
             this.ProgressTimer.Tick += new System.EventHandler(this.ProgressTimer_Tick);
             // 
             // bnPlayNext
             // 
+            this.bnPlayNext.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
             this.bnPlayNext.Location = new System.Drawing.Point(256, 172);
             this.bnPlayNext.Name = "bnPlayNext";
             this.bnPlayNext.Size = new System.Drawing.Size(48, 21);
             this.bnPlayNext.TabIndex = 3;
             this.bnPlayNext.Text = "&Play ˃";
             this.toolTip1.SetToolTip(this.bnPlayNext, "F5");
-            this.bnPlayNext.UseVisualStyleBackColor = true;
+            this.bnPlayNext.UseVisualStyleBackColor = false;
             this.bnPlayNext.Click += new System.EventHandler(this.bnPlayNext_Click);
             // 
             // bnAddCue
@@ -193,6 +180,7 @@
             // 
             // menuStrip1
             // 
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.transportToolStripMenuItem,
@@ -290,16 +278,17 @@
             this.playToolStripMenuItem,
             this.stopAllToolStripMenuItem,
             this.previousCueToolStripMenuItem,
-            this.nextCueToolStripMenuItem});
+            this.nextCueToolStripMenuItem,
+            this.toolStripSeparator3});
             this.transportToolStripMenuItem.Name = "transportToolStripMenuItem";
-            this.transportToolStripMenuItem.Size = new System.Drawing.Size(69, 20);
+            this.transportToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
             this.transportToolStripMenuItem.Text = "&Transport";
             // 
             // playToolStripMenuItem
             // 
             this.playToolStripMenuItem.Name = "playToolStripMenuItem";
             this.playToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.playToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.playToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.playToolStripMenuItem.Text = "&Play";
             this.playToolStripMenuItem.Click += new System.EventHandler(this.playToolStripMenuItem_Click);
             // 
@@ -307,16 +296,36 @@
             // 
             this.stopAllToolStripMenuItem.Name = "stopAllToolStripMenuItem";
             this.stopAllToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.stopAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.stopAllToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.stopAllToolStripMenuItem.Text = "Stop &All";
             this.stopAllToolStripMenuItem.Click += new System.EventHandler(this.stopAllToolStripMenuItem_Click);
+            // 
+            // previousCueToolStripMenuItem
+            // 
+            this.previousCueToolStripMenuItem.Name = "previousCueToolStripMenuItem";
+            this.previousCueToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
+            this.previousCueToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.previousCueToolStripMenuItem.Text = "Previous Cue";
+            this.previousCueToolStripMenuItem.Click += new System.EventHandler(this.previousCueToolStripMenuItem_Click);
+            // 
+            // nextCueToolStripMenuItem
+            // 
+            this.nextCueToolStripMenuItem.Name = "nextCueToolStripMenuItem";
+            this.nextCueToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F7;
+            this.nextCueToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.nextCueToolStripMenuItem.Text = "Next Cue";
+            this.nextCueToolStripMenuItem.Click += new System.EventHandler(this.nextCueToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(159, 6);
             // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.autoLoadLastsfxCuelistToolStripMenuItem,
-            this.playbackDeviceToolStripMenuItem,
-            this.previewDeviceToolStripMenuItem});
+            this.mnuPreloadAll});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem.Text = "Settings";
@@ -327,21 +336,19 @@
             this.autoLoadLastsfxCuelistToolStripMenuItem.CheckOnClick = true;
             this.autoLoadLastsfxCuelistToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.autoLoadLastsfxCuelistToolStripMenuItem.Name = "autoLoadLastsfxCuelistToolStripMenuItem";
-            this.autoLoadLastsfxCuelistToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+            this.autoLoadLastsfxCuelistToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
             this.autoLoadLastsfxCuelistToolStripMenuItem.Text = "Auto load last .sfx cue-list";
             this.autoLoadLastsfxCuelistToolStripMenuItem.Click += new System.EventHandler(this.autoLoadLastsfxCuelistToolStripMenuItem_Click);
             // 
-            // playbackDeviceToolStripMenuItem
+            // mnuPreloadAll
             // 
-            this.playbackDeviceToolStripMenuItem.Name = "playbackDeviceToolStripMenuItem";
-            this.playbackDeviceToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
-            this.playbackDeviceToolStripMenuItem.Text = "Playback Device";
-            // 
-            // previewDeviceToolStripMenuItem
-            // 
-            this.previewDeviceToolStripMenuItem.Name = "previewDeviceToolStripMenuItem";
-            this.previewDeviceToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
-            this.previewDeviceToolStripMenuItem.Text = "Preview Device";
+            this.mnuPreloadAll.Checked = true;
+            this.mnuPreloadAll.CheckOnClick = true;
+            this.mnuPreloadAll.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.mnuPreloadAll.Name = "mnuPreloadAll";
+            this.mnuPreloadAll.Size = new System.Drawing.Size(210, 22);
+            this.mnuPreloadAll.Text = "Pre&load All";
+            this.mnuPreloadAll.Click += new System.EventHandler(this.mnuPreloadAll_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -401,21 +408,41 @@
             this.rtPrevMainText.TabIndex = 28;
             this.rtPrevMainText.Text = "";
             // 
-            // previousCueToolStripMenuItem
+            // pictureBox1
             // 
-            this.previousCueToolStripMenuItem.Name = "previousCueToolStripMenuItem";
-            this.previousCueToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this.previousCueToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.previousCueToolStripMenuItem.Text = "Previous Cue";
-            this.previousCueToolStripMenuItem.Click += new System.EventHandler(this.previousCueToolStripMenuItem_Click);
+            this.pictureBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.pictureBox1.Location = new System.Drawing.Point(284, 164);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(576, 3);
+            this.pictureBox1.TabIndex = 29;
+            this.pictureBox1.TabStop = false;
             // 
-            // nextCueToolStripMenuItem
+            // pictureBox2
             // 
-            this.nextCueToolStripMenuItem.Name = "nextCueToolStripMenuItem";
-            this.nextCueToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F7;
-            this.nextCueToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.nextCueToolStripMenuItem.Text = "Next Cue";
-            this.nextCueToolStripMenuItem.Click += new System.EventHandler(this.nextCueToolStripMenuItem_Click);
+            this.pictureBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.pictureBox2.Location = new System.Drawing.Point(284, 193);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(576, 3);
+            this.pictureBox2.TabIndex = 30;
+            this.pictureBox2.TabStop = false;
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 428);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(861, 22);
+            this.statusStrip1.TabIndex = 31;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(815, 17);
+            this.toolStripStatusLabel1.Spring = true;
+            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // Form1
             // 
@@ -423,6 +450,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(861, 450);
+            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.pictureBox2);
+            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.rtPrevMainText);
             this.Controls.Add(this.bnNext);
             this.Controls.Add(this.bnPrev);
@@ -431,43 +461,45 @@
             this.Controls.Add(this.bnDeleteCue);
             this.Controls.Add(this.bnAddCue);
             this.Controls.Add(this.bnPlayNext);
-            this.Controls.Add(this.button2);
             this.Controls.Add(this.bnStopAll);
             this.Controls.Add(this.cbPreview);
             this.Controls.Add(this.rtMainText);
             this.Controls.Add(this.cbPlayback);
             this.Controls.Add(this.CueList);
-            this.Controls.Add(this.statusBar);
             this.Controls.Add(this.menuStrip1);
             this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
-            this.MinimumSize = new System.Drawing.Size(877, 489);
+            this.MinimumSize = new System.Drawing.Size(875, 483);
             this.Name = "Form1";
+            this.RightToLeftLayout = true;
             this.Text = "Form1";
             this.toolTip1.SetToolTip(this, "Playback");
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.Form1_ControlAdded);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.Resize += new System.EventHandler(this.Form1_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.StatusBar statusBar;
         private System.Windows.Forms.TableLayoutPanel CueList;
         private System.Windows.Forms.OpenFileDialog dlgOpenAudioFile;
         private System.Windows.Forms.ComboBox cbPlayback;
         private System.Windows.Forms.RichTextBox rtMainText;
         private System.Windows.Forms.ComboBox cbPreview;
         private System.Windows.Forms.Button bnStopAll;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Timer ProgressTimer;
         private System.Windows.Forms.Button bnPlayNext;
         private System.Windows.Forms.Button bnAddCue;
@@ -496,10 +528,14 @@
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem autoLoadLastsfxCuelistToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem playbackDeviceToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem previewDeviceToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem previousCueToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem nextCueToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.ToolStripMenuItem mnuPreloadAll;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
     }
 }
 

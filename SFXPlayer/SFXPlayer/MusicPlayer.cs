@@ -61,7 +61,7 @@ namespace AudioPlayerSample {
             _waveSource =
                 CodecFactory.Instance.GetCodec(filename)
                     .ToSampleSource()
-                    .ToMono()
+                    //.ToMono()
                     .ToWaveSource();
             _soundOut = new WasapiOut() { Latency = 100, Device = device };
             _soundOut.Initialize(_waveSource);
@@ -85,8 +85,15 @@ namespace AudioPlayerSample {
         }
 
         public void Stop() {
-            if (_soundOut != null)
+            if (_soundOut != null) {
+                for (int i = 0; i < 12; i++) {          //workaround for buffer not being flushed and what's left in the buffer
+                                                        //plays when you restart. This assumes first 10ms of track are silent and
+                                                        //plays it 12 times (guess based on latency=100)
+                    _soundOut.WaveSource.Position = 0;
+                    _soundOut.WaitForStopped(10);
+                }
                 _soundOut.Stop();
+            }
         }
 
         private void CleanupPlayback() {

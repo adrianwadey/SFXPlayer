@@ -16,6 +16,9 @@ using System.Windows.Forms;
 using AJW.General;
 using System.IO;
 using CSCore.Codecs;
+using System.Threading;
+using System.Net.Sockets;
+using System.Net;
 
 namespace SFXPlayer {
     public partial class Form1 : Form {
@@ -66,18 +69,20 @@ namespace SFXPlayer {
 
             // Set up the SoundPlayer object.
             InitializeSound();
+
         }
 
         // Sets up the status bar and other controls.
         private void InitializeControls() {
             // Set up the status bar.
             //CurrentShow.Panel = CueList;
-            StatusBarPanel panel = new StatusBarPanel();
-            panel.BorderStyle = StatusBarPanelBorderStyle.Sunken;
-            panel.Text = "Ready.";
-            panel.AutoSize = StatusBarPanelAutoSize.Spring;
-            this.statusBar.ShowPanels = true;
-            this.statusBar.Panels.Add(panel);
+            //StatusBarPanel panel = new StatusBarPanel();
+            //panel.BorderStyle = StatusBarPanelBorderStyle.Sunken;
+            //panel.Text = "Ready.";
+            //panel.AutoSize = StatusBarPanelAutoSize.Spring;
+            //this.statusBar.ShowPanels = true;
+            //this.statusBar.Panels.Add(panel);
+            ReportStatus("Ready.");
 
             ShowFileHandler.FileExtensions = FileExtensions;
             //cuelistFormSpacing = this.Height - CueList.Height;
@@ -85,6 +90,10 @@ namespace SFXPlayer {
             bnPlayNext.Top = CueList.Top + TOPGAP;
             bnPlayNext.Height = PlayStripControlHeight;
             bnPlayNext.BackColor = Settings.Default.ColourPlayerPlay;
+            pictureBox1.BackColor = Settings.Default.ColourPlayerPlay;
+            pictureBox2.BackColor = Settings.Default.ColourPlayerPlay;
+            pictureBox1.Top = bnPlayNext.Top - pictureBox1.Height;
+            pictureBox2.Top = bnPlayNext.Bottom;
             bnDeleteCue.Top = bnAddCue.Top = bnPlayNext.Top + (bnPlayNext.Height - bnAddCue.Height) / 2;
             bnNext.Top = CueList.Top + TOPGAP + bnPlayNext.Height;
             bnStopAll.Height = bnNext.Top + bnNext.Height - bnStopAll.Top;
@@ -96,6 +105,7 @@ namespace SFXPlayer {
             PlayStrip.OFD = dlgOpenAudioFile;
             PlayStrip.Devices = cbPlayback;
             PlayStrip.PreviewDevices = cbPreview;
+            autoLoadLastsfxCuelistToolStripMenuItem.Checked = Settings.Default.AutoLoadLastSession;
         }
 
         // Sets up the SoundPlayer object.
@@ -130,6 +140,8 @@ namespace SFXPlayer {
 
                 //} else {
                 this.statusBar.Panels[0].Text = statusMessage;
+                //Status.Text = statusMessage;
+                //statusBar.Refresh();
                 //}
             }
         }
@@ -192,12 +204,25 @@ namespace SFXPlayer {
             }
             rtMainText.TextChanged += rtMainText_TextChanged;
             CurrentShow.NextPlayCueIndex = NextPlayCueIndex;
+            UpdateWebApp();
         }
 
-        private void Form1_Load(object sender, EventArgs e) {
+        private void Form1_Load(object sender, EventArgs e)
+        {
             Debug.WriteLine("Form1_Load");
             Debug.WriteLine("MouseWheelScrollLines = " + SystemInformation.MouseWheelScrollLines);
-                        
+            WebApp.Start();
+            string localIP;
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0)) {
+                socket.Connect("8.8.8.8", 65530);
+                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
+                localIP = endPoint.Address.ToString();
+            }
+
+            Web.Text = "http://" + localIP + ":" + WebApp.wsPort + "/";
+            statusBar.Panels. (new LinkLabel() { Text = "test" });
+            
+            mnuPreloadAll.Checked = Settings.Default.PreloadAll;
             ShowFileHandler.FileTitleUpdate += UpdateTitleBar;
             //Insert = new PlayStrip() { Width = 100, BackColor = Color.Blue, isPlaceholder = false };
             //get the sound devices
@@ -216,7 +241,7 @@ namespace SFXPlayer {
             cbPlayback.DisplayMember = "FriendlyName";
             cbPlayback.ValueMember = "DeviceID";
             MMDevice mmDev = PlayDevices.Where(dev => dev.FriendlyName == Settings.Default.LastPlaybackDevice).FirstOrDefault();
-            if(mmDev != null) {
+            if (mmDev != null) {
                 if (cbPlayback.Items.Contains(mmDev)) {
                     Debug.WriteLine("found");
                     cbPlayback.SelectedItem = mmDev;
@@ -225,7 +250,7 @@ namespace SFXPlayer {
                 Debug.WriteLine("not found " + Settings.Default.LastPlaybackDevice);
             }
             Debug.WriteLine(((MMDevice)cbPlayback.SelectedItem).DeviceFormat.ToString());
-            
+
 
             //Preview playback device
             cbPreview.DataSource = PreviewDevices;
@@ -248,17 +273,27 @@ namespace SFXPlayer {
                 Debug.WriteLine(cmd);
             }
             FileNew();
+            string StartFile = "";
             if (args.Length == 2) {
+                StartFile = args[1];
+            } else {
+                if (autoLoadLastsfxCuelistToolStripMenuItem.Checked) {
+                    StartFile = Settings.Default.LastSession;
+                }
+            }
+            if (File.Exists(StartFile)) {
                 Show newShow;
-                newShow = ShowFileHandler.LoadFromFile(args[1]);
+                newShow = ShowFileHandler.LoadFromFile(StartFile);
                 if (newShow != null) {
                     int tempNextPlayCueIndex = newShow.NextPlayCueIndex;
                     CurrentShow = newShow;
                     NextPlayCueIndex = tempNextPlayCueIndex;
                 }
             }
-
             ResetDisplay();
+            if (mnuPreloadAll.Checked) {
+                PreloadAll();
+            }
 
             //Form1_Resize(this, new EventArgs());
             //MouseWheel += CueList_MouseWheel;
@@ -268,6 +303,7 @@ namespace SFXPlayer {
 
             FocusTrackLowestControls(Controls);     //used for pop-up volume control
             //ShowContainerControls(Controls);
+            UpdateWebApp();
         }
 
         private void UpdateTitleBar(object sender, EventArgs e) {
@@ -366,7 +402,7 @@ namespace SFXPlayer {
 
         void FileOpen(string FileName) {
             Show oldShow = CurrentShow;
-            oldShow.ShowFileBecameDirty -= ShowFileHandler.SetDirty;
+            if (oldShow != null) oldShow.ShowFileBecameDirty -= ShowFileHandler.SetDirty;
             CurrentShow = ShowFileHandler.LoadFromFile(FileName);
             if (CurrentShow != null) {
                 int tempNextPlayCueIndex = CurrentShow.NextPlayCueIndex;
@@ -391,10 +427,12 @@ namespace SFXPlayer {
             //add padding and spacers top and bottom
             Spacer sp;
             sp = new Spacer { Width = CueList.ClientSize.Width, Name = "Top" };
+            sp.Paint += Highlight_Paint;
             //sp.BackColor = Color.LightCoral;
             CueList.RowCount++;
             CueList.Controls.Add(sp, 0, 0);
             sp = new Spacer { Width = CueList.ClientSize.Width, Name = "Top spacer" };
+            sp.Paint += Highlight_Paint;
             //sp.BackColor = Color.LightSteelBlue;
             CueList.RowCount++;
             CueList.Controls.Add(sp, 0, 1);
@@ -406,6 +444,7 @@ namespace SFXPlayer {
             }
 
             sp = new Spacer { Width = CueList.ClientSize.Width, Name = "Bottom" };
+            sp.Paint += Highlight_Paint;
             //sp.BackColor = Color.LightSeaGreen;
             CueList.RowCount++;
             CueList.Controls.Add(sp, 0, CueList.RowCount - 1);
@@ -430,6 +469,7 @@ namespace SFXPlayer {
         private void AddPlaystrip(SFX sfx, int cueIndex) {
             PlayStrip ps = new PlayStrip(sfx) { Width = CueList.ClientSize.Width, PlayStripIndex = cueIndex };
             Spacer sp = new Spacer { Width = CueList.ClientSize.Width };
+            sp.Paint += Highlight_Paint;
             int rowIndex = TableRowFromCueIndex(cueIndex);
             CueList.RowCount++;
             CueList.Controls.Add(ps, 0, rowIndex);
@@ -494,10 +534,13 @@ namespace SFXPlayer {
             }
         }
 
-        private void PreloadAll(object sender, EventArgs e) {
+        private void PreloadAll() {
+            Cursor prev = Cursor.Current;
+            Cursor.Current = Cursors.WaitCursor;
             foreach (PlayStrip Player in CueList.Controls.OfType<PlayStrip>()) {
-                Player.PreloadFile(sender, e);
+                Player.PreloadFile();
             }
+            Cursor.Current = prev;
         }
 
         /// <summary>
@@ -505,6 +548,7 @@ namespace SFXPlayer {
         /// </summary>
         private void PadCueList() {
             Debug.WriteLine("PadCueList");
+            if (CueList.GetControlFromPosition(0, 0) == null) return;
             CueList.GetControlFromPosition(0, 0).Height = TOPGAP - SpacerControlHeight;
             CueList.GetControlFromPosition(0, CueList.RowCount - 1).Height = CueList.ClientSize.Height - TOPGAP;
             //BottomPlaceholders = CueList.Height / (cueListSpacing) - TOP_PLACEHOLDERS + 1;
@@ -573,10 +617,6 @@ namespace SFXPlayer {
         private void bnStopAll_Click(object sender, EventArgs e) {
             StopAll(sender, e);
             StopPreviews(sender, e);
-        }
-
-        private void button2_Click(object sender, EventArgs e) {
-            PreloadAll(sender, e);
         }
 
         private void ProgressTimer_Tick(object sender, EventArgs e) {
@@ -659,6 +699,8 @@ namespace SFXPlayer {
             PadCueList();
 
             rtMainText.Height = Math.Min(statusBar.Top - rtMainText.Margin.Bottom - rtMainText.Top, rtPrevMainText.Height);
+            pictureBox1.Top = bnPlayNext.Top - pictureBox1.Height;
+            pictureBox2.Top = bnPlayNext.Bottom;
         }
 
         private void CueList_ClientSizeChanged(object sender, EventArgs e) {
@@ -810,19 +852,19 @@ namespace SFXPlayer {
         }
 
         Control LastHovered;
-        Color LastHoveredColor;
+        Color LastColor;
         private void HighlightControl(Control ctl) {
             if (LastHovered == ctl) return;
             UnHighlightControl();
             if (ctl == null) return;
             LastHovered = ctl;
-            LastHoveredColor = LastHovered.BackColor;
+            LastColor = LastHovered.BackColor;
             LastHovered.BackColor = SystemColors.Highlight;
         }
 
         private void UnHighlightControl() {
             if (LastHovered != null) {
-                LastHovered.BackColor = LastHoveredColor;
+                LastHovered.BackColor = LastColor;
                 LastHovered = null;
             }
         }
@@ -923,7 +965,7 @@ namespace SFXPlayer {
                 if (ps != null) {
                     //we're over a PlayStrip and there's only one file
                     string msg = "do you wish to replace the file" + Environment.NewLine;
-                    msg += ps.SFX.ShortFileName + Environment.NewLine;
+                    msg += ps.SFX.ShortFileNameOnly + Environment.NewLine;
                     msg += "with" + Environment.NewLine;
                     msg += Path.GetFileName(files[0]) + Environment.NewLine;
                     msg += "in cue " + (ps.PlayStripIndex + 1).ToString("D3") + "?" + Environment.NewLine;
@@ -1040,5 +1082,92 @@ namespace SFXPlayer {
         private void nextCueToolStripMenuItem_Click(object sender, EventArgs e) {
             bnNext_Click(sender, e);
         }
+
+        private void Highlight_Paint(object sender, PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            //PlayStrip ps = NextPlayCue;
+            //if (ps != null) {
+            //    if (((Control)sender).Bottom == ps.Top) {
+            //        e.Graphics.DrawLine(Pens.Black, 0, ((Control)sender).Height - 1, ((Control)sender).Width, ((Control)sender).Height - 1);
+            //    }
+            //    if (((Control)sender).Top == ps.Bottom) {
+            //        e.Graphics.DrawLine(Pens.Black, 0, 0, ((Control)sender).Width, 0);
+            //    }
+            //}
+        }
+
+        private void mnuPreloadAll_Click(object sender, EventArgs e)
+        {
+            Settings.Default.PreloadAll = mnuPreloadAll.Checked;
+            Settings.Default.Save();
+            if (mnuPreloadAll.Checked) {
+                PreloadAll();
+            }
+        }
+        private delegate void SafeCommandDelegate();
+
+        internal void PlayNextCue() {
+            if (CueList.InvokeRequired) {
+                var d = new SafeCommandDelegate(PlayNextCue);
+                CueList.Invoke(d);
+            } else {
+                bnPlayNext_Click(null, null);
+            }
+        }
+
+        internal void StopAll() {
+            if (CueList.InvokeRequired) {
+                var d = new SafeCommandDelegate(StopAll);
+                CueList.Invoke(d);
+            } else {
+                bnStopAll_Click(null, null);
+            }
+        }
+
+        internal void PreviousCue() {
+            if (CueList.InvokeRequired) {
+                var d = new SafeCommandDelegate(PreviousCue);
+                CueList.Invoke(d);
+            } else {
+                bnPrev_Click(null, null);
+            }
+        }
+
+        internal void NextCue() {
+            if (CueList.InvokeRequired) {
+                var d = new SafeCommandDelegate(NextCue);
+                CueList.Invoke(d);
+            } else {
+                bnNext_Click(null, null);
+            }
+        }
+
+        public event EventHandler<DisplaySettings> DisplayChanged;
+
+        protected virtual void OnDisplayChanged(DisplaySettings e) {
+            DisplayChanged?.Invoke(this, e);
+        }
+
+        private void UpdateWebApp() {
+            DisplaySettings disp = new DisplaySettings() {
+                Title = Text,
+                PrevMainText = rtPrevMainText.Text,
+                MainText = rtMainText.Text,
+                TrackName = Path.GetFileName(NextPlayCue?.SFX.FileName)
+            };
+            OnDisplayChanged(disp);
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e) {
+            WebApp.StopAsync();
+        }
+    }
+
+    public class DisplaySettings {
+        public string PrevMainText;
+        public string MainText;
+        public string TrackName;
+        public string Title;
     }
 }

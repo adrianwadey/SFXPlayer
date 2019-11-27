@@ -23,7 +23,7 @@ namespace SFXPlayer {
     }
 
     public partial class PlayStrip : UserControl {
-        
+
         private Bitmap graph;
         private readonly MusicPlayer _musicPlayer = new MusicPlayer();
         private readonly MusicPlayer _PreviewPlayer = new MusicPlayer();
@@ -32,6 +32,7 @@ namespace SFXPlayer {
         public event EventHandler<StatusEventArgs> ReportStatus;
         public static ComboBox Devices;
         private MMDevice loadedDevice;
+        int prevPct = -1;
 
         #region Initialisation
 
@@ -43,7 +44,7 @@ namespace SFXPlayer {
 
         public PlayStrip(SFX SFX) : this() {
             this.SFX = SFX;
-            UpdateFileToolTip();
+            UpdateFileButton();
         }
         // Sets up the SoundPlayer object.
         private void InitializeSound() {
@@ -69,8 +70,8 @@ namespace SFXPlayer {
             _PreviewPlayer.PlaybackStopped += _PreviewPlayer_PlaybackStopped;
             volume.VolumeChanged += Volume_VolumeChanged;
             volume.Done += Volume_Done;
-            
-            
+
+
         }
 
         private void _PreviewPlayer_PlaybackStopped(object sender, PlaybackStoppedEventArgs e) {
@@ -80,7 +81,7 @@ namespace SFXPlayer {
         private void PlayStrip_Load(object sender, EventArgs e) {
             AddDnDEventHandlers(this);
         }
-        
+
         #endregion
 
         #region SFX_Object
@@ -119,7 +120,7 @@ namespace SFXPlayer {
                 case PlayerState.uninitialised:
                     if (string.IsNullOrEmpty(SFX.FileName)) {
                         BackColor = SystemColors.Control;
-                    } else { 
+                    } else {
                         BackColor = Settings.Default.ColourPlayerIdle;
                     }
                     break;
@@ -143,6 +144,7 @@ namespace SFXPlayer {
                     BackColor = Settings.Default.ColourPlayerIdle;
                     break;
             }
+            prevPct = -1;
         }
 
         public int PlayStripIndex {
@@ -164,11 +166,11 @@ namespace SFXPlayer {
             if (string.IsNullOrEmpty(SFX.FileName)) {
                 ChooseFile();
             } else {
-                if (tbDescription.Text == SFX.ShortFileName) tbDescription.Text = "";
+                if (tbDescription.Text == SFX.ShortFileNameOnly) tbDescription.Text = "";
                 SFX.FileName = "";
                 PlayerState = PlayerState.uninitialised;
             }
-            UpdateFileToolTip();
+            UpdateFileButton();
         }
 
         private void tableLayoutPanel1_MouseDoubleClick(object sender, MouseEventArgs e) {
@@ -183,15 +185,19 @@ namespace SFXPlayer {
             ChooseFile();
         }
 
-        private void UpdateFileToolTip() {
+        private void UpdateFileButton() {
             if (string.IsNullOrEmpty(SFX.FileName)) {
-                toolTip1.SetToolTip(bnFile, "Select File");
+                toolTip1.SetToolTip(bnFile, "Select Sound File");
             } else if (!File.Exists(SFX.FileName)) {
-                toolTip1.SetToolTip(bnFile, "File not found: " + SFX.ShortFileName);
+                toolTip1.SetToolTip(bnFile, "File not found: \"" + SFX.ShortFileName + "\"");
             } else {
-                toolTip1.SetToolTip(bnFile, SFX.ShortFileName);
+                toolTip1.SetToolTip(bnFile, "Remove \"" + SFX.ShortFileName + "\"");
             }
-
+            if (string.IsNullOrEmpty(SFX.FileName)) {
+                bnFile.Image = Resources.SoundFile2_18;
+            } else {
+                bnFile.Image = Resources.SoundFileClose2_18;
+            }
         }
 
         public static OpenFileDialog OFD;
@@ -212,14 +218,17 @@ namespace SFXPlayer {
 
         public void SelectFile(string FileName) {
             Settings.Default.LastAudioFolder = Path.GetDirectoryName(FileName); Settings.Default.Save();
-            if (tbDescription.Text == SFX.ShortFileName) tbDescription.Text = "";
+            if (tbDescription.Text == SFX.ShortFileNameOnly) tbDescription.Text = "";
             SFX.FileName = FileName;
-            if (tbDescription.Text == "") tbDescription.Text = SFX.ShortFileName;
+            if (tbDescription.Text == "") tbDescription.Text = SFX.ShortFileNameOnly;
             PlayerState = PlayerState.uninitialised;
-            UpdateFileToolTip();
+            UpdateFileButton();
+            if (Settings.Default.PreloadAll) {
+                PreloadFile();
+            }
         }
 
-        internal void PreloadFile(object sender, EventArgs e) {
+        internal void PreloadFile() {
             if (PlayerState == PlayerState.uninitialised) {
                 LoadFile();
             }
@@ -261,15 +270,61 @@ namespace SFXPlayer {
 
         public bool IsPlaying => (PlayerState == PlayerState.play);
 
+        private void bnPreview_Click(object sender, EventArgs e) {
+            if (_PreviewPlayer.PlaybackState == PlaybackState.Playing) {
+                _PreviewPlayer.Stop();
+            } else {
+                if (!File.Exists(SFX.FileName)) return;
+                _PreviewPlayer.Open(SFX.FileName, (MMDevice)PreviewDevices.SelectedItem);
+                _PreviewPlayer.Volume = SFX.Volume; _PreviewPlayer.Position = TimeSpan.Zero;  //this resets the volume!
+                _PreviewPlayer.Volume = SFX.Volume;
+                _PreviewPlayer.Play();
+                BackColor = Settings.Default.ColourPreview;
+            }
+            UpdatePreviewButton();
+        }
+
+        private void UpdatePreviewButton() {
+            if (_PreviewPlayer.PlaybackState == PlaybackState.Playing) {
+                bnPreview.Image = Resources.Stop2_18;
+                toolTip1.SetToolTip(bnPreview, "Stop Preview");
+            } else {
+                if (!File.Exists(SFX.FileName)) {
+                    bnPreview.Image = Resources.Blank2_18;
+                    toolTip1.SetToolTip(bnPreview, "");
+                } else {
+                    bnPreview.Image = Resources.Headphones2_18;
+                    toolTip1.SetToolTip(bnPreview, "Preview");
+                }
+            }
+        }
+
         private void bnPlay_Click(object sender, EventArgs e) {
             try {
                 if (PlayerState == PlayerState.paused) {
                     UnPause();
+                } else if (PlayerState == PlayerState.play) {
+                    Stop();
                 } else if (PlayerState != PlayerState.play) {
                     Play();
                 }
             } catch (Exception) {
                 //ReportStatus(ex.Message);
+            }
+        }
+
+        private void UpdatePlayButton() {
+            if (PlayerState == PlayerState.play) {
+                bnPlay.Image = Resources.Stop2_18;
+                toolTip1.SetToolTip(bnPlay, "Stop");
+            } else {
+                if (!File.Exists(SFX.FileName)) {
+                    bnPlay.Image = Resources.Blank2_18;
+                    toolTip1.SetToolTip(bnPlay, "");
+                } else {
+                    bnPlay.Image = Resources.Play2_18;
+                    toolTip1.SetToolTip(bnPlay, "Play");
+                }
             }
         }
 
@@ -284,7 +339,7 @@ namespace SFXPlayer {
             }
             if (PlayerState == PlayerState.loaded) {
                 PlayFromStart();
-                ReportStatus?.Invoke(this, new StatusEventArgs("Playing " + SFX.ShortFileName));
+                ReportStatus?.Invoke(this, new StatusEventArgs("Playing " + SFX.ShortFileNameOnly));
             }
             if (bnStopAll.Checked) {
                 StopAll?.Invoke(this, new EventArgs());
@@ -311,19 +366,21 @@ namespace SFXPlayer {
             _musicPlayer.Volume = SFX.Volume;
             _musicPlayer.Play();
             PlayerState = PlayerState.play;
-            
+            UpdatePlayButton();
         }
 
         private void Pause() {
             _musicPlayer.Pause();
             PlayerState = PlayerState.paused;
-            ReportStatus?.Invoke(this, new StatusEventArgs("Playing " + SFX.ShortFileName, true));
+            ReportStatus?.Invoke(this, new StatusEventArgs("Playing " + SFX.ShortFileNameOnly, true));
+            UpdatePlayButton();
         }
 
         private void UnPause() {
             _musicPlayer.Resume();
             PlayerState = PlayerState.play;
-            ReportStatus?.Invoke(this, new StatusEventArgs("Playing " + SFX.ShortFileName));
+            ReportStatus?.Invoke(this, new StatusEventArgs("Playing " + SFX.ShortFileNameOnly));
+            UpdatePlayButton();
         }
 
         public void Stop() {
@@ -333,12 +390,16 @@ namespace SFXPlayer {
                 _musicPlayer.Stop();
                 _musicPlayer.Volume = SFX.Volume;
                 PlayerState = PlayerState.loaded;
+                UpdatePlayButton();
             }
         }
 
         private void _musicPlayer_PlaybackStopped(object sender, PlaybackStoppedEventArgs e) {
             PlayerState = PlayerState.loaded;
-            ReportStatus?.Invoke(this, new StatusEventArgs("Playing " + SFX.ShortFileName, true));
+            UpdatePlayButton();
+            try {
+                ReportStatus?.Invoke(this, new StatusEventArgs("Playing " + SFX.ShortFileNameOnly, true));
+            } catch { }
         }
 
         #endregion
@@ -346,10 +407,11 @@ namespace SFXPlayer {
         #region ProgressBar
 
         private void ResizeProgressBar() {
-            if (Program.mainForm.WindowState == FormWindowState.Minimized) return;
+            if (Program.mainForm?.WindowState == FormWindowState.Minimized) return;
             graph = new Bitmap(Width, Height);
             BackgroundImage = graph;
             //BackgroundImageLayout = ImageLayout.Stretch;
+            prevPct = -1;
             DrawGraph(Progress);
         }
 
@@ -367,12 +429,13 @@ namespace SFXPlayer {
             if (pct == Progress) return;
             Progress = pct;
             SuspendLayout();
-            DrawGraph(pct);
+            Rectangle Changed = DrawGraph(pct);
             ResumeLayout();
-            Refresh();
+            Invalidate(Changed);
+            //Refresh();
         }
 
-        private void DrawGraph(int pct) {
+        private Rectangle DrawGraph(int pct) {
             pct = Math.Max(0, Math.Min(Width, pct));
             Graphics graphGraphics = Graphics.FromImage(graph);
             SolidBrush brush = new SolidBrush(Settings.Default.ColourPlayerPlay);
@@ -382,6 +445,14 @@ namespace SFXPlayer {
             brush = new SolidBrush(Settings.Default.ColourPlayerLoaded);
             if (pct < Width) {
                 graphGraphics.FillRectangle(brush, pct, 0, Width - pct, Height);
+            }
+            if (prevPct == -1) {
+                prevPct = pct;
+                return new Rectangle(0, 0, Width, Height);
+            } else {
+                Rectangle result = new Rectangle(prevPct, 0, pct, Height);
+                prevPct = pct;
+                return result;
             }
         }
 
@@ -406,19 +477,25 @@ namespace SFXPlayer {
                 Loc.Y += Location.Y + Height;
                 if (Loc.Y + volume.Height > Parent.Parent.ClientSize.Height) {
                     Debug.WriteLine("Won't fit");
-                    return;
+                    //return;
+                    Loc.Y = Parent.Parent.ClientSize.Height - volume.Height;
                 }
                 Parent.Parent.Controls.Add(volume);
                 Parent.Parent.Controls.SetChildIndex(volume, 0);
                 volume.Location = Loc;
                 volume.Volume = SFX.Volume;
                 volume.Focus();
+                Debug.WriteLine("This = " + this.ToString());
+                Debug.WriteLine("Parent = " + Parent.ToString());
+                Debug.WriteLine("Parent.Parent = " + Parent.Parent.ToString());
+                BackColor = SystemColors.Highlight;
             }
         }
 
         private void Volume_VolumeChanged(object sender, EventArgs e) {
             SFX.Volume = volume.Volume;
             _musicPlayer.Volume = SFX.Volume;
+            toolTip1.SetToolTip(bnVolume, "Vol=" + SFX.Volume.ToString());
         }
 
         private void Volume_Done(object sender, EventArgs e) {
@@ -429,6 +506,7 @@ namespace SFXPlayer {
             if (Parent.Parent.Controls.Contains(volume)) {
                 Parent.Parent.Controls.Remove(volume);
             }
+            UpdatePlayerState(PlayerState);
         }
         #endregion
 
@@ -466,27 +544,6 @@ namespace SFXPlayer {
             }
         }
         #endregion
-
-        private void previewToolStripMenuItem_Click(object sender, EventArgs e) {
-            if (_PreviewPlayer.PlaybackState == PlaybackState.Playing) {
-                _PreviewPlayer.Stop();
-            } else {
-                if (!File.Exists(SFX.FileName)) return;
-                _PreviewPlayer.Open(SFX.FileName, (MMDevice)PreviewDevices.SelectedItem);
-                _PreviewPlayer.Volume = SFX.Volume; _PreviewPlayer.Position = TimeSpan.Zero;  //this resets the volume!
-                _PreviewPlayer.Volume = SFX.Volume;
-                _PreviewPlayer.Play();
-                BackColor = Settings.Default.ColourPreview;
-            }
-        }
-
-        private void contextMenu_Opening(object sender, CancelEventArgs e) {
-            if (_PreviewPlayer.PlaybackState == PlaybackState.Playing) {
-                previewToolStripMenuItem.Text = "Stop Preview";
-            } else {
-                previewToolStripMenuItem.Text = "Preview";
-            }
-        }
     }
 
     public class StatusEventArgs : EventArgs {

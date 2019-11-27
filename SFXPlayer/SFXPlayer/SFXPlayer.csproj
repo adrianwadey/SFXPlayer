@@ -69,10 +69,13 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>FXPlayer.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL">
@@ -93,6 +96,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions.cs" />
     <Compile Include="FileHandler.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -111,6 +115,11 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SFX.cs" />
     <Compile Include="Show.cs" />
     <Compile Include="Spacer.cs">
@@ -132,6 +141,7 @@
       <DependentUpon>ucVolume.cs</DependentUpon>
     </Compile>
     <Compile Include="WAVSounds.cs" />
+    <Compile Include="WebApp.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -140,14 +150,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <EmbeddedResource Include="Spacer.resx">
       <DependentUpon>Spacer.cs</DependentUpon>
     </EmbeddedResource>
@@ -178,10 +183,53 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FXPlayer.ico" />
-    <None Include="FXPlayerIconCircularLight.png" />
-    <Content Include="Play.ico" />
-    <Content Include="Play.png" />
-    <Content Include="Stop.png" />
+    <Content Include="html\404.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="html\favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="html\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="html\sfx.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Play.png" />
+    <Content Include="Resources\Stop.png" />
+    <None Include="Resources\Stop2-36 - Copy.png" />
+    <None Include="Resources\Play2-18.png" />
+    <None Include="Resources\Stop2-36.png" />
+    <None Include="Resources\Play2-36.png" />
+    <None Include="Resources\Stop2-18.png" />
+    <None Include="Resources\SoundFileClose2-36.png" />
+    <None Include="Resources\SoundFileClose2-18.png" />
+    <None Include="Resources\SoundFile2-36.png" />
+    <None Include="Resources\SoundFile2-18.png" />
+    <None Include="Resources\Stop2.png" />
+    <None Include="Resources\SoundFile2-12.png" />
+    <None Include="Resources\SoundFile2.png" />
+    <None Include="Resources\Play2.png" />
+    <None Include="Resources\Blank2-12.png" />
+    <None Include="Resources\Blank2.png" />
+    <None Include="Resources\Blank2-18.png" />
+    <None Include="Resources\Blank2-36.png" />
+    <Content Include="Resources\FXPlayer.ico" />
+    <None Include="Resources\Stop2-12.png" />
+    <None Include="Resources\Play2-12.png" />
+    <None Include="Resources\Preview.png" />
+    <None Include="Resources\FXPlayerIconCircularLight.png" />
+    <Content Include="Resources\Headphones.ico" />
+    <None Include="Resources\Headphones2-12.png" />
+    <None Include="Resources\Headphones2.png" />
+    <None Include="Resources\Headphones2-18.png" />
+    <None Include="Resources\Headphones2-36.png" />
+    <Content Include="Resources\Pause.png" />
+    <None Include="Resources\Pause2-12.png" />
+    <None Include="Resources\Pause2.png" />
+    <None Include="Resources\Pause2-18.png" />
+    <None Include="Resources\Pause2-36.png" />
+    <Content Include="Resources\Play.ico" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

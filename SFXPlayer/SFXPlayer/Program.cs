@@ -19,7 +19,6 @@ namespace SFXPlayer {
             ss.Show();
 #endif  
             Properties.Settings.Default.Upgrade();
-
             mainForm = new Form1();
             Application.Run(mainForm);
         }

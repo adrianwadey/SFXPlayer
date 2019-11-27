@@ -61,6 +61,8 @@ namespace AJW.General {
         internal ObjectType LoadFromFile(string FileName) {
             Settings.Default.LastAudioFolder = Path.GetDirectoryName(FileName); Settings.Default.Save();
             CurrentFileName = FileName;
+            Settings.Default.LastSession = CurrentFileName;
+            Settings.Default.Save();
             ObjectType temp = Load(CurrentFileName);     //needs to return new object
             Environment.CurrentDirectory = Path.GetDirectoryName(CurrentFileName);
             Dirty = false;

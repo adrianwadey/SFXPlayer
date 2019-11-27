@@ -27,16 +27,17 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.lbIndex = new System.Windows.Forms.Label();
             this.tbDescription = new System.Windows.Forms.TextBox();
-            this.bnPlay = new System.Windows.Forms.Button();
-            this.bnPause = new System.Windows.Forms.Button();
+            this.bnPlay = new System.Windows.Forms.PictureBox();
             this.bnStopAll = new System.Windows.Forms.CheckBox();
-            this.bnFile = new System.Windows.Forms.Button();
-            this.bnVolume = new System.Windows.Forms.Button();
+            this.bnFile = new System.Windows.Forms.PictureBox();
+            this.bnVolume = new System.Windows.Forms.PictureBox();
+            this.bnPreview = new System.Windows.Forms.PictureBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.previewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
-            this.contextMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.bnPlay)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bnFile)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bnVolume)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bnPreview)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -44,18 +45,18 @@
             this.tableLayoutPanel1.ColumnCount = 7;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 26F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
             this.tableLayoutPanel1.Controls.Add(this.lbIndex, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.tbDescription, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.bnPlay, 3, 0);
-            this.tableLayoutPanel1.Controls.Add(this.bnPause, 4, 0);
+            this.tableLayoutPanel1.Controls.Add(this.bnPlay, 4, 0);
             this.tableLayoutPanel1.Controls.Add(this.bnStopAll, 5, 0);
             this.tableLayoutPanel1.Controls.Add(this.bnFile, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.bnVolume, 6, 0);
+            this.tableLayoutPanel1.Controls.Add(this.bnPreview, 3, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -82,88 +83,78 @@
             this.tbDescription.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbDescription.Location = new System.Drawing.Point(34, 3);
             this.tbDescription.Name = "tbDescription";
-            this.tbDescription.Size = new System.Drawing.Size(219, 20);
+            this.tbDescription.Size = new System.Drawing.Size(214, 20);
             this.tbDescription.TabIndex = 1;
             this.tbDescription.TextChanged += new System.EventHandler(this.tbDescription_TextChanged);
             this.tbDescription.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.tbDescription_MouseDoubleClick);
             // 
             // bnPlay
             // 
-            this.bnPlay.BackgroundImage = global::SFXPlayer.Properties.Resources.Play;
-            this.bnPlay.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.bnPlay.Location = new System.Drawing.Point(285, 3);
+            this.bnPlay.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.bnPlay.Image = global::SFXPlayer.Properties.Resources.Play2_18;
+            this.bnPlay.Location = new System.Drawing.Point(308, 3);
             this.bnPlay.Name = "bnPlay";
             this.bnPlay.Size = new System.Drawing.Size(20, 20);
+            this.bnPlay.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.bnPlay.TabIndex = 2;
-            this.bnPlay.UseVisualStyleBackColor = true;
+            this.bnPlay.TabStop = false;
             this.bnPlay.Click += new System.EventHandler(this.bnPlay_Click);
-            // 
-            // bnPause
-            // 
-            this.bnPause.BackgroundImage = global::SFXPlayer.Properties.Resources.Stop;
-            this.bnPause.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.bnPause.Location = new System.Drawing.Point(311, 3);
-            this.bnPause.Name = "bnPause";
-            this.bnPause.Size = new System.Drawing.Size(20, 20);
-            this.bnPause.TabIndex = 3;
-            this.bnPause.UseVisualStyleBackColor = true;
-            this.bnPause.Click += new System.EventHandler(this.bnStop_Click);
             // 
             // bnStopAll
             // 
             this.bnStopAll.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.bnStopAll.Location = new System.Drawing.Point(340, 6);
-            this.bnStopAll.Margin = new System.Windows.Forms.Padding(6);
+            this.bnStopAll.Location = new System.Drawing.Point(338, 6);
+            this.bnStopAll.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.bnStopAll.Name = "bnStopAll";
             this.bnStopAll.Size = new System.Drawing.Size(14, 15);
             this.bnStopAll.TabIndex = 4;
-            this.toolTip1.SetToolTip(this.bnStopAll, "Stop All Other Sounds");
+            this.toolTip1.SetToolTip(this.bnStopAll, "Stops All Other Sounds");
             this.bnStopAll.UseVisualStyleBackColor = true;
             this.bnStopAll.CheckedChanged += new System.EventHandler(this.bnStopAll_CheckedChanged);
             // 
             // bnFile
             // 
-            this.bnFile.Location = new System.Drawing.Point(259, 3);
+            this.bnFile.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.bnFile.Image = global::SFXPlayer.Properties.Resources.SoundFile2_18;
+            this.bnFile.Location = new System.Drawing.Point(254, 3);
             this.bnFile.Name = "bnFile";
-            this.bnFile.Size = new System.Drawing.Size(20, 21);
+            this.bnFile.Size = new System.Drawing.Size(21, 21);
+            this.bnFile.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.bnFile.TabIndex = 5;
-            this.bnFile.Text = "File";
+            this.bnFile.TabStop = false;
             this.toolTip1.SetToolTip(this.bnFile, "File");
-            this.bnFile.UseVisualStyleBackColor = true;
             this.bnFile.Click += new System.EventHandler(this.bnFile_Click);
             // 
             // bnVolume
             // 
-            this.bnVolume.Location = new System.Drawing.Point(363, 3);
+            this.bnVolume.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.bnVolume.Location = new System.Drawing.Point(362, 3);
             this.bnVolume.Name = "bnVolume";
             this.bnVolume.Size = new System.Drawing.Size(20, 20);
             this.bnVolume.TabIndex = 6;
+            this.bnVolume.TabStop = false;
             this.bnVolume.Text = "Volume";
-            this.bnVolume.UseVisualStyleBackColor = true;
-            this.bnVolume.Click += new System.EventHandler(this.bnVolume_Click);
             this.bnVolume.Enter += new System.EventHandler(this.bnVolume_Enter);
+            this.bnVolume.Click += new System.EventHandler(this.bnVolume_Click);
             // 
-            // contextMenu
+            // bnPreview
             // 
-            this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.previewToolStripMenuItem});
-            this.contextMenu.Name = "contextMenuStrip1";
-            this.contextMenu.Size = new System.Drawing.Size(116, 26);
-            this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
-            // 
-            // previewToolStripMenuItem
-            // 
-            this.previewToolStripMenuItem.Name = "previewToolStripMenuItem";
-            this.previewToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
-            this.previewToolStripMenuItem.Text = "&Preview";
-            this.previewToolStripMenuItem.Click += new System.EventHandler(this.previewToolStripMenuItem_Click);
+            this.bnPreview.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.bnPreview.Image = global::SFXPlayer.Properties.Resources.Headphones2_18;
+            this.bnPreview.Location = new System.Drawing.Point(281, 3);
+            this.bnPreview.Name = "bnPreview";
+            this.bnPreview.Size = new System.Drawing.Size(21, 21);
+            this.bnPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.bnPreview.TabIndex = 7;
+            this.bnPreview.TabStop = false;
+            this.bnPreview.Click += new System.EventHandler(this.bnPreview_Click);
             // 
             // PlayStrip
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackgroundImage = global::SFXPlayer.Properties.Resources.Play;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.ContextMenuStrip = this.contextMenu;
             this.Controls.Add(this.tableLayoutPanel1);
             this.DoubleBuffered = true;
             this.Margin = new System.Windows.Forms.Padding(0);
@@ -174,7 +165,10 @@
             this.Resize += new System.EventHandler(this.PlayStrip_Resize);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
-            this.contextMenu.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.bnPlay)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bnFile)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bnVolume)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bnPreview)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -184,13 +178,11 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label lbIndex;
         private System.Windows.Forms.TextBox tbDescription;
-        private System.Windows.Forms.Button bnPlay;
-        private System.Windows.Forms.Button bnPause;
+        private System.Windows.Forms.PictureBox bnPlay;
         private System.Windows.Forms.CheckBox bnStopAll;
         private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.Button bnFile;
-        private System.Windows.Forms.Button bnVolume;
-        private System.Windows.Forms.ContextMenuStrip contextMenu;
-        private System.Windows.Forms.ToolStripMenuItem previewToolStripMenuItem;
+        private System.Windows.Forms.PictureBox bnFile;
+        private System.Windows.Forms.PictureBox bnVolume;
+        private System.Windows.Forms.PictureBox bnPreview;
     }
 }
