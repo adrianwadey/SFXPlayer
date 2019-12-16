@@ -162,6 +162,9 @@
     <EmbeddedResource Include="ucVolume.resx">
       <DependentUpon>ucVolume.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="..\..\LICENSE.md">
+      <Link>LICENSE.md</Link>
+    </None>
     <None Include="..\..\README.md">
       <Link>README.md</Link>
     </None>
@@ -176,7 +179,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="SFXPlayer_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -196,7 +198,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Play.png" />
+    <Content Include="SFXPlayer282.png" />
     <Content Include="Resources\Stop.png" />
+    <Content Include="SFXPlayer.PNG" />
     <None Include="Resources\Stop2-36 - Copy.png" />
     <None Include="Resources\Play2-18.png" />
     <None Include="Resources\Stop2-36.png" />

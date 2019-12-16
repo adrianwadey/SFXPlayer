@@ -1,6 +1,8 @@
 # SFXPlayer
 ## Windows Sound Effects Launcher ##
 
+Sound Effects Player for theatrical use.
+
 ![SplashScreen](SFXPlayer/SFXPlayer/SplashScreen.png)
 
 
@@ -10,7 +12,17 @@ Latest release 1.1.0.1
 
 ![Screenshot](SFXPlayer/SFXPlayer/SFXPlayer.PNG)
 
-Sound Effects Player for theatrical use.
+# A new version is on the way that includes remote control from your phone.
+
+### Build from source
+
+If building from source you will need the cscore nugget
+
+```
+project -> Manage Nugets -> restore from online sources
+```
+
+## Instructions for use
 
 *    Click + to add a cue
 *    Click the "F" File button and choose the sound file. Click "F" again to remove the file

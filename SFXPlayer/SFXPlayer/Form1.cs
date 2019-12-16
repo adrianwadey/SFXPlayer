@@ -24,7 +24,7 @@ namespace SFXPlayer {
     public partial class Form1 : Form {
         const int TOPPLACEHOLDER = -1;
         const int BOTTOMPLACEHOLDER = -2;
-        const string FileExtensions = "Show Files (*.sfx)|*.sfx";
+        const string FileExtensions = "SFX Cue Files (*.sfx)|*.sfx";
         private bool InitialisingDevices = false;
         private XMLFileHandler<Show> ShowFileHandler = new XMLFileHandler<Show>();
         private Show _CurrentShow;
@@ -219,9 +219,13 @@ namespace SFXPlayer {
                 localIP = endPoint.Address.ToString();
             }
 
-            WebLink.IsLink = true;
-            WebLink.Text = "http://" + localIP + ":" + WebApp.wsPort + "/";
-            
+            if (WebApp.Serving) {
+                WebLink.IsLink = true;
+                WebLink.Text = "http://" + localIP + ":" + WebApp.wsPort + "/";
+            } else {
+                WebLink.IsLink = false;
+                WebLink.Text = "Web-App not available (run as admin)";
+            }
             mnuPreloadAll.Checked = Settings.Default.PreloadAll;
             ShowFileHandler.FileTitleUpdate += UpdateTitleBar;
             //Insert = new PlayStrip() { Width = 100, BackColor = Color.Blue, isPlaceholder = false };
@@ -246,10 +250,10 @@ namespace SFXPlayer {
                     Debug.WriteLine("found");
                     cbPlayback.SelectedItem = mmDev;
                 }
+                Debug.WriteLine(((MMDevice)cbPlayback.SelectedItem).DeviceFormat.ToString());
             } else {
                 Debug.WriteLine("not found " + Settings.Default.LastPlaybackDevice);
             }
-            Debug.WriteLine(((MMDevice)cbPlayback.SelectedItem).DeviceFormat.ToString());
 
 
             //Preview playback device
@@ -1165,14 +1169,6 @@ namespace SFXPlayer {
 
         private void WebLink_Click(object sender, EventArgs e) {
             Process.Start(WebLink.Text);
-        }
-
-        private void button1_Click_1(object sender, EventArgs e) {
-            DisplaySettings disp = new DisplaySettings() {
-                Title = "Title Changed",
-                PrevMainText = "Previous Text Changed",
-            };
-            OnDisplayChanged(disp);
         }
     }
 

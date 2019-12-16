@@ -22,11 +22,15 @@ namespace SFXPlayer
         public static void Start()
         {
             if (Listener != null) return;
-            Listener = new HttpListener();
-            Listener.Prefixes.Add(Prefix + wsPort.ToString() + "/");
-            Listener.Start();
-            Listener.BeginGetContext(GetContextCallback, null);
-            Program.mainForm.DisplayChanged += UpdateWebAppsWithDisplayChangeAsync;
+            try {
+                Listener = new HttpListener();
+                Listener.Prefixes.Add(Prefix + wsPort.ToString() + "/");
+                Listener.Start();
+                Listener.BeginGetContext(GetContextCallback, null);
+                Program.mainForm.DisplayChanged += UpdateWebAppsWithDisplayChangeAsync;
+            } catch (Exception) {
+                Listener = null;
+            }
         }
 
         public static async void StopAsync() {
@@ -38,7 +42,7 @@ namespace SFXPlayer
                     webSockets.Remove(ws);
                 }
             }
-            Listener.Stop();
+            Listener?.Stop();
             Listener = null;
             Program.mainForm.DisplayChanged -= UpdateWebAppsWithDisplayChangeAsync;
         }
@@ -131,6 +135,9 @@ namespace SFXPlayer
         }
         private static List<WebSocket> webSockets = new List<WebSocket>();
         private static byte[] LastMessage = null;
+
+        public static bool Serving => Listener != null;
+
         private async static void ProcessWebSocketRequest(HttpListenerContext context) {
             WebSocketContext wsContext = null;
             try {
