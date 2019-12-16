@@ -101,7 +101,7 @@ namespace SFXPlayer {
             rtPrevMainText.Height = bnStopAll.Top - bnStopAll.Margin.Top - rtPrevMainText.Margin.Bottom - rtPrevMainText.Top;
 
             rtMainText.Top = bnStopAll.Bottom + rtMainText.Margin.Top + bnStopAll.Margin.Bottom;
-            rtMainText.Height = Math.Min(statusBar.Top - rtMainText.Margin.Bottom - rtMainText.Top, rtPrevMainText.Height);
+            rtMainText.Height = Math.Min(statusStrip.Top - rtMainText.Margin.Bottom - rtMainText.Top, rtPrevMainText.Height);
             PlayStrip.OFD = dlgOpenAudioFile;
             PlayStrip.Devices = cbPlayback;
             PlayStrip.PreviewDevices = cbPreview;
@@ -132,14 +132,14 @@ namespace SFXPlayer {
         public void ReportStatus(string statusMessage) {
             // If the caller passed in a message...
 
-            if (this.statusBar.InvokeRequired) {
+            if (this.statusStrip.InvokeRequired) {
                 Action<string> d = new Action<string>(ReportStatus);
                 this.Invoke(d, new object[] { statusMessage });
             } else {
                 //if (string.IsNullOrEmpty(statusMessage)) {
 
                 //} else {
-                this.statusBar.Panels[0].Text = statusMessage;
+                this.statusBar.Text = statusMessage;
                 //Status.Text = statusMessage;
                 //statusBar.Refresh();
                 //}
@@ -219,8 +219,8 @@ namespace SFXPlayer {
                 localIP = endPoint.Address.ToString();
             }
 
-            Web.Text = "http://" + localIP + ":" + WebApp.wsPort + "/";
-            statusBar.Panels. (new LinkLabel() { Text = "test" });
+            WebLink.IsLink = true;
+            WebLink.Text = "http://" + localIP + ":" + WebApp.wsPort + "/";
             
             mnuPreloadAll.Checked = Settings.Default.PreloadAll;
             ShowFileHandler.FileTitleUpdate += UpdateTitleBar;
@@ -698,7 +698,7 @@ namespace SFXPlayer {
             //this.statusBar.Panels[0].Text = "NumberOfPlaceholders = " + (BottomPlaceholders + TOP_PLACEHOLDERS).ToString();
             PadCueList();
 
-            rtMainText.Height = Math.Min(statusBar.Top - rtMainText.Margin.Bottom - rtMainText.Top, rtPrevMainText.Height);
+            rtMainText.Height = Math.Min(statusStrip.Top - rtMainText.Margin.Bottom - rtMainText.Top, rtPrevMainText.Height);
             pictureBox1.Top = bnPlayNext.Top - pictureBox1.Height;
             pictureBox2.Top = bnPlayNext.Bottom;
         }
@@ -795,7 +795,7 @@ namespace SFXPlayer {
 
         private void Ps_ReportStatus(object sender, StatusEventArgs e) {
             if (e.Clear) {
-                if (statusBar.Panels[0].Text == e.Status) {
+                if (statusBar.Text == e.Status) {
                     ReportStatus("");
                 }
             } else {
@@ -1162,12 +1162,28 @@ namespace SFXPlayer {
         private void Form1_FormClosed(object sender, FormClosedEventArgs e) {
             WebApp.StopAsync();
         }
+
+        private void WebLink_Click(object sender, EventArgs e) {
+            Process.Start(WebLink.Text);
+        }
+
+        private void button1_Click_1(object sender, EventArgs e) {
+            DisplaySettings disp = new DisplaySettings() {
+                Title = "Title Changed",
+                PrevMainText = "Previous Text Changed",
+            };
+            OnDisplayChanged(disp);
+        }
     }
 
     public class DisplaySettings {
-        public string PrevMainText;
-        public string MainText;
-        public string TrackName;
-        public string Title;
+        [DefaultValue("")]
+        public string PrevMainText = "";
+        [DefaultValue("")]
+        public string MainText = "";
+        [DefaultValue("")]
+        public string TrackName = "";
+        [DefaultValue("")]
+        public string Title = "";
     }
 }
