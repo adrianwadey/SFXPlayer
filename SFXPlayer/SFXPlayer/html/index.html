@@ -1,9 +1,10 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />    
     <title id="Title">SFX Player</title>
-    <script src="sfx.js"></script>
+    <script src="webapp.js"></script>
     <style>
         .disable-selection{
             -moz-user-select: none;
@@ -17,20 +18,20 @@
 
 <body>
     <table style="position: absolute; top: 0; bottom: 0; left: 0; right:0; border: 1px solid; height: 100%; width:100%">
-        <tr style="height: 40%;">
+        <tr style="height: 40%; outline: 1px solid; background-color:gray;">
             <td id="PrevMainText" colspan="4">Previous Cue</td>
         </tr>
-        <tr style="height: 40%;">
+        <tr style="height: 40%; outline: 1px solid;">
             <td id="MainText" colspan="4">Main Cue</td>
         </tr>
-        <tr style="height: 10%;">
+        <tr style="height: 10%; outline: 1px solid;">
             <td id="TrackName" colspan="4">Track Name</td>
         </tr>
         <tr style="height: 10%;">
-            <td style="background-color:gray; text-align:center; width:25%;" onclick="sfxws.sendCommand('previous')">Previous</td>
-            <td style="background-color:red; text-align:center; width:25%;" onclick="sfxws.sendCommand('stop')">Stop</td>
-            <td style="background-color:limegreen; text-align:center; width:25%;" onclick="sfxws.sendCommand('play')">Go</td>
-            <td style="background-color:gray; text-align:center; width:25%;" onclick="sfxws.sendCommand('next')">Next</td>
+            <td style="background-color:gray; text-align:center; width:25%;" onclick="webapp.sendCommand('previous')">Previous</td>
+            <td style="background-color:red; text-align:center; width:25%;" onclick="webapp.sendCommand('stop')">Stop</td>
+            <td style="background-color:limegreen; text-align:center; width:25%;" onclick="webapp.sendCommand('play')">Go</td>
+            <td style="background-color:gray; text-align:center; width:25%;" onclick="webapp.sendCommand('next')">Next</td>
         </tr>
     </table>
 </body>

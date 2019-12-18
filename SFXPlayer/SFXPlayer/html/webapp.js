@@ -1,4 +1,4 @@
-﻿var SFXWebSocket = function () {
+﻿var WebApp = function () {
     var ws;
     if ("WebSocket" in window) {
 
@@ -51,7 +51,7 @@
 }
 
 function init() {
-    sfxws = new SFXWebSocket();
+    webapp = new WebApp();
 }
 
 document.addEventListener('DOMContentLoaded', init);

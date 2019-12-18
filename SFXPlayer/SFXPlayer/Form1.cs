@@ -19,6 +19,7 @@ using CSCore.Codecs;
 using System.Threading;
 using System.Net.Sockets;
 using System.Net;
+using System.Xml.Serialization;
 
 namespace SFXPlayer {
     public partial class Form1 : Form {
@@ -1177,8 +1178,8 @@ namespace SFXPlayer {
         public string PrevMainText = "";
         [DefaultValue("")]
         public string MainText = "";
-        [DefaultValue("")]
-        public string TrackName = "";
+        [DefaultValue(null)]
+        public string TrackName = null;
         [DefaultValue("")]
         public string Title = "";
     }
