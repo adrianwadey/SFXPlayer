@@ -1,27 +1,20 @@
-﻿using CSCore.CoreAudioAPI;
+﻿using AJW.General;
+using NAudio.CoreAudioApi;
+using NAudio.Wave;
 using SFXPlayer.Properties;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Media;
-using static System.Reflection.MethodBase;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using AJW.General;
 using System.IO;
-using CSCore.Codecs;
-using System.Threading;
-using System.Net.Sockets;
+using System.Linq;
 using System.Net;
-using System.Xml.Serialization;
+using System.Net.Sockets;
+using System.Windows.Forms;
 
-namespace SFXPlayer {
+namespace SFXPlayer
+{
     public partial class Form1 : Form {
         const int TOPPLACEHOLDER = -1;
         const int BOTTOMPLACEHOLDER = -2;
@@ -121,11 +114,11 @@ namespace SFXPlayer {
             //player.SoundLocationChanged += new EventHandler(player_LocationChanged);
 
             //set up list of file extensions for checking dragndrop files
-            filters = CodecFactory.SupportedFilesFilterEn.Split(new char[] { '|' });
-            filters = filters[1].Split(new char[] { ';' });
-            for (int i = 0; i < filters.Length; i++) {
-                filters[i] = filters[i].Substring(1).ToUpper();
-            }
+            //filters = CodecFactory.SupportedFilesFilterEn.Split(new char[] { '|' });
+            //filters = filters[1].Split(new char[] { ';' });
+            //for (int i = 0; i < filters.Length; i++) {
+            //    filters[i] = filters[i].Substring(1).ToUpper();
+            //}
         }
 
         // Convenience method for setting message text in 
@@ -230,44 +223,56 @@ namespace SFXPlayer {
             mnuPreloadAll.Checked = Settings.Default.PreloadAll;
             ShowFileHandler.FileTitleUpdate += UpdateTitleBar;
             //Insert = new PlayStrip() { Width = 100, BackColor = Color.Blue, isPlaceholder = false };
+
             //get the sound devices
-            using (var mmdeviceEnumerator = new MMDeviceEnumerator()) {
-                using (
-                    var mmdeviceCollection = mmdeviceEnumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active)) {
-                    foreach (var device in mmdeviceCollection) {
+            //string[] DevNamesFull = DirectSoundOut.Devices.Select(d=>d.Description).ToArray();
+
+            using (var mmdeviceEnumerator = new MMDeviceEnumerator())
+            {
+                var mmdeviceCollection = mmdeviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+                {
+                    foreach (var device in mmdeviceCollection)
+                    {
                         PlayDevices.Add(device);
                         PreviewDevices.Add(device);
                     }
                 }
             }
+
             //Normal playback device
             InitialisingDevices = true;
             cbPlayback.DataSource = PlayDevices;
             cbPlayback.DisplayMember = "FriendlyName";
-            cbPlayback.ValueMember = "DeviceID";
+            cbPlayback.ValueMember = "ID";
             MMDevice mmDev = PlayDevices.Where(dev => dev.FriendlyName == Settings.Default.LastPlaybackDevice).FirstOrDefault();
-            if (mmDev != null) {
-                if (cbPlayback.Items.Contains(mmDev)) {
+            if (mmDev != null)
+            {
+                if (cbPlayback.Items.Contains(mmDev))
+                {
                     Debug.WriteLine("found");
                     cbPlayback.SelectedItem = mmDev;
                 }
-                Debug.WriteLine(((MMDevice)cbPlayback.SelectedItem).DeviceFormat.ToString());
-            } else {
+            }
+            else
+            {
                 Debug.WriteLine("not found " + Settings.Default.LastPlaybackDevice);
             }
-
-
+            
             //Preview playback device
             cbPreview.DataSource = PreviewDevices;
             cbPreview.DisplayMember = "FriendlyName";
-            cbPreview.ValueMember = "DeviceID";
+            cbPreview.ValueMember = "ID";
             mmDev = PreviewDevices.Where(dev => dev.FriendlyName == Settings.Default.LastPreviewDevice).FirstOrDefault();
-            if (mmDev != null) {
-                if (cbPreview.Items.Contains(mmDev)) {
+            if (mmDev != null)
+            {
+                if (cbPreview.Items.Contains(mmDev))
+                {
                     Debug.WriteLine("found");
                     cbPreview.SelectedItem = mmDev;
                 }
-            } else {
+            }
+            else
+            {
                 Debug.WriteLine("not found " + Settings.Default.LastPreviewDevice);
             }
             InitialisingDevices = false;
@@ -1062,7 +1067,7 @@ namespace SFXPlayer {
 
         private void cbPlayback_SelectedIndexChanged(object sender, EventArgs e) {
             if (InitialisingDevices) return;
-            Settings.Default.LastPlaybackDevice = ((MMDevice)cbPlayback.SelectedItem).FriendlyName;
+            Settings.Default.LastPlaybackDevice = ((MMDevice)cbPlayback.SelectedItem).DeviceFriendlyName;
             Settings.Default.Save();
             Debug.WriteLine(Settings.Default.LastPlaybackDevice);
             ResetDisplay();
@@ -1075,7 +1080,7 @@ namespace SFXPlayer {
 
         private void cbPreview_SelectedIndexChanged(object sender, EventArgs e) {
             if (InitialisingDevices) return;
-            Settings.Default.LastPreviewDevice = ((MMDevice)cbPreview.SelectedItem).FriendlyName;
+            Settings.Default.LastPreviewDevice = ((MMDevice)cbPreview.SelectedItem).DeviceFriendlyName;
             Settings.Default.Save();
             Debug.WriteLine(Settings.Default.LastPreviewDevice);
         }
@@ -1091,15 +1096,18 @@ namespace SFXPlayer {
         private void Highlight_Paint(object sender, PaintEventArgs e)
         {
             base.OnPaint(e);
-            //PlayStrip ps = NextPlayCue;
-            //if (ps != null) {
-            //    if (((Control)sender).Bottom == ps.Top) {
-            //        e.Graphics.DrawLine(Pens.Black, 0, ((Control)sender).Height - 1, ((Control)sender).Width, ((Control)sender).Height - 1);
-            //    }
-            //    if (((Control)sender).Top == ps.Bottom) {
-            //        e.Graphics.DrawLine(Pens.Black, 0, 0, ((Control)sender).Width, 0);
-            //    }
-            //}
+            PlayStrip ps = NextPlayCue;
+            if (ps != null)
+            {
+                if (((Control)sender).Bottom == ps.Top)
+                {
+                    e.Graphics.DrawLine(Pens.Black, 0, ((Control)sender).Height - 1, ((Control)sender).Width, ((Control)sender).Height - 1);
+                }
+                if (((Control)sender).Top == ps.Bottom)
+                {
+                    e.Graphics.DrawLine(Pens.Black, 0, 0, ((Control)sender).Width, 0);
+                }
+            }
         }
 
         private void mnuPreloadAll_Click(object sender, EventArgs e)

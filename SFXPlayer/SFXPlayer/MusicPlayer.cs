@@ -1,113 +1,134 @@
-﻿using System;
+﻿using NAudio.CoreAudioApi;
+using NAudio.Wave;
+using System;
 using System.ComponentModel;
-using CSCore;
-using CSCore.Codecs;
-using CSCore.CoreAudioAPI;
-using CSCore.SoundOut;
+using System.IO;
+using System.Threading;
 
-namespace AudioPlayerSample {
-    public class MusicPlayer : Component {
-        private ISoundOut _soundOut;
-        private IWaveSource _waveSource;
+namespace AudioPlayerSample
+{
+    public class MusicPlayer : Component
+    {
+        private WaveOut _soundOut;
+        private WaveStream _waveSource;
 
-        public event EventHandler<PlaybackStoppedEventArgs> PlaybackStopped;
+        public event EventHandler<StoppedEventArgs> PlaybackStopped;
 
-        public PlaybackState PlaybackState {
-            get {
+        public PlaybackState PlaybackState
+        {
+            get
+            {
                 if (_soundOut != null)
                     return _soundOut.PlaybackState;
                 return PlaybackState.Stopped;
             }
         }
 
-        public TimeSpan Position {
-            get {
+        public TimeSpan Position
+        {
+            get
+            {
                 if (_waveSource != null)
-                    return _waveSource.GetPosition();
+                    return _waveSource.CurrentTime;
                 return TimeSpan.Zero;
             }
-            set {
+            set
+            {
                 if (_waveSource != null)
-                    _waveSource.SetPosition(value);
+                    _waveSource.CurrentTime = value;
                 if (_soundOut != null)
-                    _soundOut.Initialize(_waveSource);
+                    _soundOut.Init(_waveSource);
             }
         }
 
-        public TimeSpan Length {
-            get {
+        public TimeSpan Length
+        {
+            get
+            {
                 if (_waveSource != null)
-                    return _waveSource.GetLength();
+                    return _waveSource.TotalTime;
                 return TimeSpan.Zero;
             }
         }
 
-        public int Volume {
-            get {
+        public int Volume
+        {
+            get
+            {
                 if (_soundOut != null)
                     return Math.Min(100, Math.Max((int)(_soundOut.Volume * 100), 0));
                 return 100;
             }
-            set {
-                if (_soundOut != null) {
+            set
+            {
+                if (_soundOut != null)
+                {
                     _soundOut.Volume = Math.Min(1.0f, Math.Max(value / 100f, 0f));
                 }
             }
         }
 
-        public void Open(string filename, MMDevice device) {
+        public void Open(string filename, int deviceNumber)
+        {
             CleanupPlayback();
 
-            _waveSource =
-                CodecFactory.Instance.GetCodec(filename)
-                    .ToSampleSource()
-                    //.ToMono()
-                    .ToWaveSource();
-            _soundOut = new WasapiOut() { Latency = 100, Device = device };
-            _soundOut.Initialize(_waveSource);
-            if (PlaybackStopped != null) _soundOut.Stopped += PlaybackStopped;
+            _waveSource = new AudioFileReader(filename);
+            _soundOut = new WaveOut();
+            _soundOut.DeviceNumber = deviceNumber; // new WaveOutEvent() { DeviceNumber = 1 }; // new WasapiOut(device, AudioClientShareMode.Shared, false, 100);
+            _soundOut.Init(_waveSource);
+            if (PlaybackStopped != null) _soundOut.PlaybackStopped += PlaybackStopped;
         }
 
-        public void Play() {
+        public void Play()
+        {
             if (_soundOut != null)
-                _soundOut.Initialize(_waveSource);
-                _soundOut.Play();
+                _soundOut.Init(_waveSource);
+            _soundOut.Play();
         }
 
-        public void Pause() {
+        public void Pause()
+        {
             if (_soundOut != null)
                 _soundOut.Pause();
         }
 
-        public void Resume() {
+        public void Resume()
+        {
             if (_soundOut != null)
-                _soundOut.Resume();
+                _soundOut.Play();
         }
 
-        public void Stop() {
-            if (_soundOut != null) {
-                for (int i = 0; i < 12; i++) {          //workaround for buffer not being flushed and what's left in the buffer
-                                                        //plays when you restart. This assumes first 10ms of track are silent and
-                                                        //plays it 12 times (guess based on latency=100)
-                    _soundOut.WaveSource.Position = 0;
-                    _soundOut.WaitForStopped(10);
-                }
+        public void Stop()
+        {
+            if (_soundOut != null)
+            {
+                //for (int i = 0; i < 12; i++)
+                //{          //workaround for buffer not being flushed and what's left in the buffer
+                //           //plays when you restart. This assumes first 10ms of track are silent and
+                //           //plays it 12 times (guess based on latency=100)
+                //    _soundOut.WaveSource.Position = 0;
+                //    _soundOut.WaitForStopped(10);
+                //}
                 _soundOut.Stop();
             }
         }
 
-        private void CleanupPlayback() {
-            if (_soundOut != null) {
+        private void CleanupPlayback()
+        {
+            if (_soundOut != null)
+            {
                 _soundOut.Dispose();
                 _soundOut = null;
             }
-            if (_waveSource != null) {
+            if (_waveSource != null)
+            {
                 _waveSource.Dispose();
                 _waveSource = null;
             }
         }
 
-        protected override void Dispose(bool disposing) {
+        protected override void Dispose(bool disposing)
+        {
             base.Dispose(disposing);
             CleanupPlayback();
         }

@@ -33,18 +33,21 @@
             this.bnVolume = new System.Windows.Forms.PictureBox();
             this.bnPreview = new System.Windows.Forms.PictureBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.bnEdit = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bnPlay)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bnFile)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bnVolume)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bnPreview)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bnEdit)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
             // 
-            this.tableLayoutPanel1.ColumnCount = 7;
+            this.tableLayoutPanel1.ColumnCount = 8;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
@@ -55,8 +58,9 @@
             this.tableLayoutPanel1.Controls.Add(this.bnPlay, 4, 0);
             this.tableLayoutPanel1.Controls.Add(this.bnStopAll, 5, 0);
             this.tableLayoutPanel1.Controls.Add(this.bnFile, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.bnVolume, 6, 0);
+            this.tableLayoutPanel1.Controls.Add(this.bnVolume, 7, 0);
             this.tableLayoutPanel1.Controls.Add(this.bnPreview, 3, 0);
+            this.tableLayoutPanel1.Controls.Add(this.bnEdit, 6, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -83,7 +87,7 @@
             this.tbDescription.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbDescription.Location = new System.Drawing.Point(34, 3);
             this.tbDescription.Name = "tbDescription";
-            this.tbDescription.Size = new System.Drawing.Size(214, 20);
+            this.tbDescription.Size = new System.Drawing.Size(187, 20);
             this.tbDescription.TabIndex = 1;
             this.tbDescription.TextChanged += new System.EventHandler(this.tbDescription_TextChanged);
             this.tbDescription.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.tbDescription_MouseDoubleClick);
@@ -92,7 +96,7 @@
             // 
             this.bnPlay.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.bnPlay.Image = global::SFXPlayer.Properties.Resources.Play2_18;
-            this.bnPlay.Location = new System.Drawing.Point(308, 3);
+            this.bnPlay.Location = new System.Drawing.Point(281, 3);
             this.bnPlay.Name = "bnPlay";
             this.bnPlay.Size = new System.Drawing.Size(20, 20);
             this.bnPlay.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -103,8 +107,8 @@
             // bnStopAll
             // 
             this.bnStopAll.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.bnStopAll.Location = new System.Drawing.Point(338, 6);
-            this.bnStopAll.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.bnStopAll.Location = new System.Drawing.Point(311, 6);
+            this.bnStopAll.Margin = new System.Windows.Forms.Padding(6);
             this.bnStopAll.Name = "bnStopAll";
             this.bnStopAll.Size = new System.Drawing.Size(14, 15);
             this.bnStopAll.TabIndex = 4;
@@ -116,7 +120,7 @@
             // 
             this.bnFile.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.bnFile.Image = global::SFXPlayer.Properties.Resources.SoundFile2_18;
-            this.bnFile.Location = new System.Drawing.Point(254, 3);
+            this.bnFile.Location = new System.Drawing.Point(227, 3);
             this.bnFile.Name = "bnFile";
             this.bnFile.Size = new System.Drawing.Size(21, 21);
             this.bnFile.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -141,13 +145,22 @@
             // 
             this.bnPreview.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.bnPreview.Image = global::SFXPlayer.Properties.Resources.Headphones2_18;
-            this.bnPreview.Location = new System.Drawing.Point(281, 3);
+            this.bnPreview.Location = new System.Drawing.Point(254, 3);
             this.bnPreview.Name = "bnPreview";
             this.bnPreview.Size = new System.Drawing.Size(21, 21);
             this.bnPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.bnPreview.TabIndex = 7;
             this.bnPreview.TabStop = false;
             this.bnPreview.Click += new System.EventHandler(this.bnPreview_Click);
+            // 
+            // bnEdit
+            // 
+            this.bnEdit.Location = new System.Drawing.Point(335, 3);
+            this.bnEdit.Name = "bnEdit";
+            this.bnEdit.Size = new System.Drawing.Size(20, 20);
+            this.bnEdit.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.bnEdit.TabIndex = 8;
+            this.bnEdit.TabStop = false;
             // 
             // PlayStrip
             // 
@@ -169,6 +182,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.bnFile)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bnVolume)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bnPreview)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bnEdit)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -184,5 +198,6 @@
         private System.Windows.Forms.PictureBox bnFile;
         private System.Windows.Forms.PictureBox bnVolume;
         private System.Windows.Forms.PictureBox bnPreview;
+        private System.Windows.Forms.PictureBox bnEdit;
     }
 }
