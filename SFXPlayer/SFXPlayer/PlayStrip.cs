@@ -696,6 +696,12 @@ namespace SFXPlayer
             }
         }
         #endregion
+
+        private void bnEdit_Click(object sender, EventArgs e)
+        {
+            TimeStamper timeStamper = new TimeStamper();
+            timeStamper.Edit(SFX);
+        }
     }
 
     public class StatusEventArgs : EventArgs

@@ -1,8 +1,10 @@
 ﻿using AJW.General;
 using NAudio.CoreAudioApi;
+using NAudio.CoreAudioApi.Interfaces;
 using NAudio.Wave;
 using SFXPlayer.Properties;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -51,6 +53,9 @@ namespace SFXPlayer
         private readonly int TOPGAP = 5 * (new PlayStrip().Height + new Spacer().Height);
         private readonly ObservableCollection<MMDevice> PlayDevices = new ObservableCollection<MMDevice>();
         private readonly ObservableCollection<MMDevice> PreviewDevices = new ObservableCollection<MMDevice>();
+        private MMDeviceEnumerator deviceEnum = new MMDeviceEnumerator();
+        private AudioDeviceNotifications audioDeviceNotifications;
+        private IMMNotificationClient notifyClient;
         public static Control lastFocused;
         string[] filters;
 
@@ -226,18 +231,36 @@ namespace SFXPlayer
 
             //get the sound devices
             //string[] DevNamesFull = DirectSoundOut.Devices.Select(d=>d.Description).ToArray();
+            //for (int n = -1; n < WaveOut.DeviceCount; n++)
+            //{
+            //    var caps = WaveOut.GetCapabilities(n);
+            //    Debug.WriteLine($"{n}: {caps.ProductName}");
+            //}
+            List<WaveOutCapabilities> Devices= new List<WaveOutCapabilities>();
 
-            using (var mmdeviceEnumerator = new MMDeviceEnumerator())
+            Debug.WriteLine("waveout devices:");
+            for (int n = 0; n < WaveOut.DeviceCount; n++)
             {
-                var mmdeviceCollection = mmdeviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+                var caps = WaveOut.GetCapabilities(n);
+                Devices.Add(caps);
+                Debug.WriteLine($"{n}: {caps.ProductName}");
+            }
+            Debug.WriteLine("mm devices:");
+
+            var mmdeviceCollection = deviceEnum.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+            {
+                foreach (var device in mmdeviceCollection)
                 {
-                    foreach (var device in mmdeviceCollection)
-                    {
-                        PlayDevices.Add(device);
-                        PreviewDevices.Add(device);
-                    }
+                    PlayDevices.Add(device);
+                    PreviewDevices.Add(device);
+                    Debug.WriteLine(device.ToString());
                 }
             }
+
+            audioDeviceNotifications = new AudioDeviceNotifications();
+            audioDeviceNotifications.AudioDevicesChanged += AudioDeviceNotifications_AudioDevicesChanged;
+            notifyClient = audioDeviceNotifications;
+            deviceEnum.RegisterEndpointNotificationCallback(notifyClient);
 
             //Normal playback device
             InitialisingDevices = true;
@@ -314,6 +337,23 @@ namespace SFXPlayer
             FocusTrackLowestControls(Controls);     //used for pop-up volume control
             //ShowContainerControls(Controls);
             UpdateWebApp();
+        }
+
+        private void AudioDeviceNotifications_AudioDevicesChanged(object sender, EventArgs e)
+        {
+            PlayDevices.Clear();
+            PreviewDevices.Clear();
+            var mmdeviceCollection = deviceEnum.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+            {
+                foreach (var device in mmdeviceCollection)
+                {
+                    PlayDevices.Add(device);
+                    PreviewDevices.Add(device);
+                    Debug.WriteLine(device.ToString());
+                }
+            }
+
+
         }
 
         private void UpdateTitleBar(object sender, EventArgs e) {
@@ -1080,6 +1120,7 @@ namespace SFXPlayer
 
         private void cbPreview_SelectedIndexChanged(object sender, EventArgs e) {
             if (InitialisingDevices) return;
+            Debug.WriteLine(cbPreview.SelectedIndex.ToString() + ": " + cbPreview.SelectedValue.ToString() + " ~ " + cbPreview.SelectedItem.ToString());
             Settings.Default.LastPreviewDevice = ((MMDevice)cbPreview.SelectedItem).DeviceFriendlyName;
             Settings.Default.Save();
             Debug.WriteLine(Settings.Default.LastPreviewDevice);

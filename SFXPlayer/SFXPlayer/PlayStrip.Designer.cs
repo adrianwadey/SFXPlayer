@@ -32,8 +32,8 @@
             this.bnFile = new System.Windows.Forms.PictureBox();
             this.bnVolume = new System.Windows.Forms.PictureBox();
             this.bnPreview = new System.Windows.Forms.PictureBox();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.bnEdit = new System.Windows.Forms.PictureBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bnPlay)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bnFile)).BeginInit();
@@ -161,6 +161,7 @@
             this.bnEdit.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.bnEdit.TabIndex = 8;
             this.bnEdit.TabStop = false;
+            this.bnEdit.Click += new System.EventHandler(this.bnEdit_Click);
             // 
             // PlayStrip
             // 
