@@ -34,6 +34,7 @@
             this.bnPreview = new System.Windows.Forms.PictureBox();
             this.bnEdit = new System.Windows.Forms.PictureBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bnPlay)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bnFile)).BeginInit();
@@ -163,6 +164,11 @@
             this.bnEdit.TabStop = false;
             this.bnEdit.Click += new System.EventHandler(this.bnEdit_Click);
             // 
+            // timer1
+            // 
+            this.timer1.Interval = 400;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // PlayStrip
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -200,5 +206,6 @@
         private System.Windows.Forms.PictureBox bnVolume;
         private System.Windows.Forms.PictureBox bnPreview;
         private System.Windows.Forms.PictureBox bnEdit;
+        private System.Windows.Forms.Timer timer1;
     }
 }

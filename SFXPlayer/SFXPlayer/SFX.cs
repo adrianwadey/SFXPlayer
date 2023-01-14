@@ -9,6 +9,7 @@ using System.Xml.Serialization;
 
 namespace SFXPlayer {
     [Serializable]
+    [XmlInclude(typeof(MSCEvent))]
     public class SFX {
         internal Action SFXBecameDirty;
         private string _Description = "";

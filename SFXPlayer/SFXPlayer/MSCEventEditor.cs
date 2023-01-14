@@ -16,26 +16,25 @@ using System.Windows.Forms;
 
 namespace SFXPlayer
 {
-    public partial class TriggerEditor : Form
+    public partial class MSCEventEditor : Form
     {
-        public TriggerEditor()
+        public MSCEventEditor()
         {
             InitializeComponent();
         }
 
-        private Trigger trigger;
-        internal static void Edit(Trigger trigger)
+        private MSCEvent MSC;
+        internal static void Edit(MSCEvent msc)
         {
-            Debug.WriteLine(trigger);
-            TriggerEditor editor = new TriggerEditor();
-            editor.trigger = trigger;
+            Debug.WriteLine(msc);
+            MSCEventEditor editor = new MSCEventEditor();
+            editor.MSC = msc;
             editor.ShowDialog();
         }
 
-        private void TriggerEditor_Load(object sender, EventArgs e)
+        private void MSCEventEditor_Load(object sender, EventArgs e)
         {
-            textBox1.Text = trigger.Description;
-            textBox2.Text = BitConverter.ToString(trigger.bytes);
+            textBox1.Text = MSC.MIDIBytes.ToString();
         }
     }
 

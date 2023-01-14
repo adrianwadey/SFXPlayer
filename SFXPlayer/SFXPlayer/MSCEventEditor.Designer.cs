@@ -1,6 +1,6 @@
 ﻿namespace SFXPlayer
 {
-    partial class TriggerEditor
+    partial class MSCEventEditor
     {
         /// <summary>
         /// Required designer variable.
@@ -46,16 +46,16 @@
             this.textBox2.Size = new System.Drawing.Size(100, 20);
             this.textBox2.TabIndex = 1;
             // 
-            // TriggerEditor
+            // MSCEventEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
-            this.Name = "TriggerEditor";
-            this.Text = "TriggerEditor";
-            this.Load += new System.EventHandler(this.TriggerEditor_Load);
+            this.Name = "MSCEventEditor";
+            this.Text = "MSCEventEditor";
+            this.Load += new System.EventHandler(this.MSCEventEditor_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

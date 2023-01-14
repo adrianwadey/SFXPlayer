@@ -162,6 +162,8 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="AbstractShowEvent.cs" />
+    <Compile Include="MSCEvent.cs" />
     <Compile Include="MusicPlayer.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -204,11 +206,11 @@
       <DependentUpon>TimeStamper.cs</DependentUpon>
     </Compile>
     <Compile Include="Trigger.cs" />
-    <Compile Include="TriggerEditor.cs">
+    <Compile Include="MSCEventEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TriggerEditor.Designer.cs">
-      <DependentUpon>TriggerEditor.cs</DependentUpon>
+    <Compile Include="MSCEventEditor.Designer.cs">
+      <DependentUpon>MSCEventEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="ucVolume.cs">
       <SubType>UserControl</SubType>
@@ -242,8 +244,8 @@
     <EmbeddedResource Include="TimeStamper.resx">
       <DependentUpon>TimeStamper.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TriggerEditor.resx">
-      <DependentUpon>TriggerEditor.cs</DependentUpon>
+    <EmbeddedResource Include="MSCEventEditor.resx">
+      <DependentUpon>MSCEventEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ucVolume.resx">
       <DependentUpon>ucVolume.cs</DependentUpon>
@@ -295,6 +297,8 @@
     <EmbeddedResource Include="Resources\stop-fill.svg" />
     <EmbeddedResource Include="Resources\volume-mute-fill.svg" />
     <EmbeddedResource Include="Resources\volume-up-fill.svg" />
+    <EmbeddedResource Include="Resources\stopwatch-fill.svg" />
+    <EmbeddedResource Include="Resources\stopwatch.svg" />
     <Content Include="SFXPlayer282.png" />
     <Content Include="Resources\Stop.png" />
     <Content Include="SFXPlayer.PNG" />

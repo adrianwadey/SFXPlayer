@@ -53,15 +53,25 @@ namespace SFXPlayer
 
         private void InitialiseButtons()
         {
-            bnVolume.Image = FromSvgResource("volume-up-fill.svg");
-            bnPlay.Image = FromSvgResource("play-fill.svg");
-            bnEdit.Image = FromSvgResource("clock-history.svg");
+            UpdateButton(bnVolume, "volume-up-fill.svg");
+            UpdateButton(bnPreview, "headphones.svg");
+            UpdateButton(bnPlay, "play-fill.svg");
+            UpdateButton(bnEdit, "blank.svg");
+        }
+
+        private void UpdateButton(PictureBox Button, string ButtonImageName)
+        {
+            if ((string)Button.Tag != ButtonImageName)
+            {
+                Button.Tag = ButtonImageName;
+                Button.Image = FromSvgResource(ButtonImageName);
+            }
         }
 
         public PlayStrip(SFX SFX) : this()
         {
             this.SFX = SFX;
-            UpdateFileButton();
+            UpdateButtons();
         }
         // Sets up the SoundPlayer object.
         private void InitializeSound()
@@ -95,6 +105,7 @@ namespace SFXPlayer
 
         private void _PreviewPlayer_PlaybackStopped(object sender, StoppedEventArgs e)
         {
+            timer1.Stop();
             UpdatePlayerState(PlayerState);
         }
 
@@ -209,7 +220,7 @@ namespace SFXPlayer
                 SFX.FileName = "";
                 PlayerState = PlayerState.uninitialised;
             }
-            UpdateFileButton();
+            UpdateButtons();
         }
 
         private void tableLayoutPanel1_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -227,28 +238,32 @@ namespace SFXPlayer
             ChooseFile();
         }
 
-        private void UpdateFileButton()
+        private void UpdateButtons()
         {
             if (string.IsNullOrEmpty(SFX.FileName))
             {
+                UpdateButton(bnFile, "file-music.svg");
                 toolTip1.SetToolTip(bnFile, "Select Sound File");
             }
             else if (!File.Exists(SFX.FileName))
             {
+                UpdateButton(bnFile, "file-earmark-music.svg");
                 toolTip1.SetToolTip(bnFile, "File not found: \"" + SFX.ShortFileName + "\"");
             }
             else
             {
+                UpdateButton(bnFile, "file-earmark-music-fill.svg");
                 toolTip1.SetToolTip(bnFile, "Remove \"" + SFX.ShortFileName + "\"");
             }
-            if (string.IsNullOrEmpty(SFX.FileName))
+            if (SFX.Triggers.Any())
             {
-                bnFile.Image = FromSvgResource("file-music.svg");
+                UpdateButton(bnEdit, "stopwatch-fill.svg");
             }
             else
             {
-                bnFile.Image = FromSvgResource("file-earmark-music.svg");
+                UpdateButton(bnEdit, "stopwatch.svg");
             }
+            UpdatePlayButton();
             UpdatePreviewButton();
         }
 
@@ -278,7 +293,7 @@ namespace SFXPlayer
             SFX.FileName = FileName;
             if (tbDescription.Text == "") tbDescription.Text = SFX.ShortFileNameOnly;
             PlayerState = PlayerState.uninitialised;
-            UpdateFileButton();
+            UpdateButtons();
             if (Settings.Default.PreloadAll)
             {
                 PreloadFile();
@@ -335,48 +350,6 @@ namespace SFXPlayer
 
         public bool IsPlaying => (PlayerState == PlayerState.play);
 
-        private void bnPreview_Click(object sender, EventArgs e)
-        {
-            if (_PreviewPlayer.PlaybackState == PlaybackState.Playing)
-            {
-                _PreviewPlayer.Stop();
-            }
-            else
-            {
-                if (!File.Exists(SFX.FileName)) return;
-                _PreviewPlayer.Open(SFX.FileName, PreviewDevices.SelectedIndex);
-                _PreviewPlayer.Volume = SFX.Volume; _PreviewPlayer.Position = TimeSpan.Zero;  //this resets the volume!
-                _PreviewPlayer.Volume = SFX.Volume;
-                _PreviewPlayer.Play();
-                BackColor = Settings.Default.ColourPreview;
-            }
-            UpdatePreviewButton();
-        }
-
-        private void UpdatePreviewButton()
-        {
-            if (_PreviewPlayer.PlaybackState == PlaybackState.Playing)
-            {
-                //bnPreview.Image = Resources.Stop2_18;
-                bnPreview.Image = FromSvgResource("stop-fill.svg");
-                toolTip1.SetToolTip(bnPreview, "Stop Preview");
-            }
-            else
-            {
-                if (!File.Exists(SFX.FileName))
-                {
-                    bnPreview.Image = FromSvgResource("blank.svg");
-                    toolTip1.SetToolTip(bnPreview, "");
-                }
-                else
-                {
-                    //bnPreview.Image = Resources.Headphones2_18;
-                    bnPreview.Image = FromSvgResource("headphones.svg");
-                    toolTip1.SetToolTip(bnPreview, "Preview");
-                }
-            }
-        }
-
         private Bitmap FromSvgResource(string resourcename)
         {
             // Determine path
@@ -419,20 +392,62 @@ namespace SFXPlayer
         {
             if (PlayerState == PlayerState.play)
             {
-                bnPlay.Image = FromSvgResource("stop-fill.svg");
+                UpdateButton(bnPlay, "stop-fill.svg");
                 toolTip1.SetToolTip(bnPlay, "Stop");
             }
             else
             {
                 if (!File.Exists(SFX.FileName))
                 {
-                    bnPlay.Image = FromSvgResource("blank.svg");
+                    UpdateButton(bnPlay, "blank.svg");
                     toolTip1.SetToolTip(bnPlay, "");
                 }
                 else
                 {
-                    bnPlay.Image = FromSvgResource("play-fill.svg");
+                    UpdateButton(bnPlay, "play-fill.svg");
                     toolTip1.SetToolTip(bnPlay, "Play");
+                }
+            }
+        }
+
+        private void bnPreview_Click(object sender, EventArgs e)
+        {
+            if (_PreviewPlayer.PlaybackState == PlaybackState.Playing)
+            {
+                _PreviewPlayer.Stop();
+            }
+            else
+            {
+                if (!File.Exists(SFX.FileName)) return;
+                _PreviewPlayer.Open(SFX.FileName, PreviewDevices.SelectedIndex);
+                _PreviewPlayer.Volume = SFX.Volume; _PreviewPlayer.Position = TimeSpan.Zero;  //this resets the volume!
+                _PreviewPlayer.Volume = SFX.Volume;
+                _PreviewPlayer.Play();
+                BackColor = Settings.Default.ColourPreview;
+            }
+            UpdatePreviewButton();
+        }
+
+        private void UpdatePreviewButton()
+        {
+            if (_PreviewPlayer.PlaybackState == PlaybackState.Playing)
+            {
+                //bnPreview.Image = Resources.Stop2_18;
+                UpdateButton(bnPreview, "stop-fill.svg");
+                toolTip1.SetToolTip(bnPreview, "Stop Preview");
+            }
+            else
+            {
+                if (!File.Exists(SFX.FileName))
+                {
+                    UpdateButton(bnPreview, "blank.svg");
+                    toolTip1.SetToolTip(bnPreview, "");
+                }
+                else
+                {
+                    //bnPreview.Image = Resources.Headphones2_18;
+                    UpdateButton(bnPreview, "headphones.svg");
+                    toolTip1.SetToolTip(bnPreview, "Preview");
                 }
             }
         }
@@ -485,6 +500,11 @@ namespace SFXPlayer
             _musicPlayer.Position = TimeSpan.Zero;  //this resets the volume!
             _musicPlayer.Volume = SFX.Volume;
             _musicPlayer.Play();
+            if (SFX.Triggers.Any())
+            {
+                timer1.Start();
+                LastTrigger = 0;
+            }
             PlayerState = PlayerState.play;
             UpdatePlayButton();
         }
@@ -701,6 +721,42 @@ namespace SFXPlayer
         {
             TimeStamper timeStamper = new TimeStamper();
             timeStamper.Edit(SFX);
+        }
+
+        int _LastTrigger = 0;
+        int LastTrigger
+        {
+            get
+            {
+                return _LastTrigger;
+            }
+            set
+            {
+                if (_LastTrigger != value)
+                {
+                    _LastTrigger = value;
+                    //Debug.WriteLine($"new trigger value = {value}");
+                }
+            }
+        }
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            var position = _musicPlayer.Position.Ticks;
+            while (LastTrigger < SFX.Triggers.Count())
+            {
+                if (SFX.Triggers[LastTrigger].TimeTicks <= position)
+                {
+                    Debug.Write(new TimeSpan(SFX.Triggers[LastTrigger].TimeTicks).ToString());        //trigger this event now
+                    SFX.Triggers[LastTrigger].showEvent.Execute();
+                    //Debug.WriteLine(SFX.Triggers[LastTrigger].showEvent.ToString());        //trigger this event now
+                }
+                else
+                {
+                    break;
+                }
+                LastTrigger++;
+            }
+            if (LastTrigger >= SFX.Triggers.Count()) timer1.Stop();
         }
     }
 

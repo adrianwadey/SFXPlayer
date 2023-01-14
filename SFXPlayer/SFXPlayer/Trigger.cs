@@ -12,16 +12,16 @@ namespace SFXPlayer
     {
         public override string ToString()
         {
-            return  Time.ToString(@"mm\:ss\.ff") + "\t" + Description;
+            return  new TimeSpan(TimeTicks).ToString(@"mm\:ss\.ff") + "\t" + Description;
         }
 
         internal void Edit()
         {
-            TriggerEditor.Edit(this);
+            showEvent.Edit();
         }
         
         public string Description;
-        public DateTime Time;
-        public byte[] bytes = {0xf0, 0x7f, 0x7f, 0x02, 0x01, 0x01, 0xf7}; //go command
+        public long TimeTicks;
+        public AbstractShowEvent showEvent;
     }
 }

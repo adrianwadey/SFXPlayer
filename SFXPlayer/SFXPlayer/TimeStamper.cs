@@ -40,32 +40,58 @@ namespace SFXPlayer
 
         private void Triggers_ListChanged(object sender, ListChangedEventArgs e)
         {
-            if (e.ListChangedType == ListChangedType.ItemChanged)
-            {
-                listBox1.SelectedItem = ActiveTrigger;
-            }
+            //changed to avoid re-ordering of trigger points.
+            //Debug.WriteLine("changed");
+            //SFX.Triggers = new BindingList<Trigger>(SFX.Triggers.OrderBy(t => t.TimeTicks).ToList());
+            //if (e.ListChangedType == ListChangedType.ItemChanged)
+            //{
+            //    listBox1.SelectedItem = ActiveTrigger;
+            //}
         }
 
         Bitmap bm;
         Point ClickedAt;
-        Trigger ActiveTrigger;
+        private Trigger _ActiveTrigger;
+        int trigmin, trigmax;
+        Trigger ActiveTrigger
+        {
+            get
+            {
+                return _ActiveTrigger;
+            }
+            set
+            {
+                _ActiveTrigger = value;
+                trigmin = trackBar1.Minimum;    //always 0
+                trigmax = trackBar1.Maximum;    //limit range of trigger (prevent overlapping)
+                if (listBox1.SelectedIndex > 0)
+                {
+                    trigmin = TicksToPosition(((Trigger)listBox1.Items[listBox1.SelectedIndex - 1]).TimeTicks) + 2;
+                }
+                if (listBox1.SelectedIndex < listBox1.Items.Count - 1)
+                {
+                    trigmax = TicksToPosition(((Trigger)listBox1.Items[listBox1.SelectedIndex + 1]).TimeTicks);
+                }
+            }
+        }
 
         public TimeSpan WaveLength { get; private set; }
 
         private void pictureBox1_DoubleClick(object sender, EventArgs e)
         {
-            var trig = new Trigger() { Description = "MIDIEvent" };
-            trig.Time = PositionToTime(ClickedAt.X);
+            var trig = new Trigger() { Description = "MIDIEvent", showEvent = new MSCEvent() };
+            trig.TimeTicks = PositionToTicks(ClickedAt.X);
             SFX.Triggers.Add(trig);
             ActiveTrigger = trig;
             RedrawTriggers();
         }
-        private void RedrawTriggers(){
+        private void RedrawTriggers()
+        {
             bm = new Bitmap(pictureBox1.BackgroundImage.Width, pictureBox1.BackgroundImage.Height);
             Graphics g = Graphics.FromImage(bm);
             foreach (var trig in SFX.Triggers)
             {
-                var X = TimeToPosition(trig.Time);
+                var X = TicksToPosition(trig.TimeTicks);
                 if (listBox1.SelectedItem == trig)
                 {
                     g.DrawLine(Pens.Red, X, 0, X, bm.Height - 1);
@@ -87,14 +113,14 @@ namespace SFXPlayer
             }
         }
 
-        private int TimeToPosition(DateTime time)
+        private int TicksToPosition(long ticks)
         {
-            return (int)(pictureBox1.BackgroundImage.Width * time.Ticks / WaveLength.Ticks);
+            return (int)(pictureBox1.BackgroundImage.Width * ticks / WaveLength.Ticks);
         }
 
-        private DateTime PositionToTime(int x)
+        private long PositionToTicks(int x)
         {
-            return new DateTime(WaveLength.Ticks * x / pictureBox1.BackgroundImage.Width);
+            return WaveLength.Ticks * x / pictureBox1.BackgroundImage.Width;
         }
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
@@ -127,6 +153,7 @@ namespace SFXPlayer
                 pictureBox1.Image = bm;
             }
             trackBar1.Maximum = myRendererSettings.Width;
+            ActiveTrigger = ActiveTrigger;      //force update of movement limits
             RedrawTriggers();
         }
 
@@ -138,7 +165,10 @@ namespace SFXPlayer
 
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
-            ActiveTrigger.Time = PositionToTime(trackBar1.Value);
+            int newval = trackBar1.Value;
+            newval = Math.Max(trigmin, newval);
+            newval = Math.Min(trigmax, newval);
+            ActiveTrigger.TimeTicks = PositionToTicks(newval);
             SFX.Triggers.ResetBindings();
             RedrawTriggers();
         }
