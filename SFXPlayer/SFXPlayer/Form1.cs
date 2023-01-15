@@ -60,8 +60,8 @@ namespace SFXPlayer
         private readonly int PlayStripControlHeight = new PlayStrip().Height;
         private readonly int SpacerControlHeight = new Spacer().Height;
         private readonly int TOPGAP = 5 * (new PlayStrip().Height + new Spacer().Height);
-        private readonly ObservableCollection<MMDevice> PlayDevices = new ObservableCollection<MMDevice>();
-        private readonly ObservableCollection<MMDevice> PreviewDevices = new ObservableCollection<MMDevice>();
+        private readonly ObservableCollection<string> PlayDevices = new ObservableCollection<string>();
+        private readonly ObservableCollection<string> PreviewDevices = new ObservableCollection<string>();
         private MMDeviceEnumerator deviceEnum = new MMDeviceEnumerator();
         private AudioDeviceNotifications audioDeviceNotifications;
         private IMMNotificationClient notifyClient;
@@ -317,11 +317,13 @@ namespace SFXPlayer
 
             var mmdeviceCollection = deviceEnum.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
             {
-                foreach (var device in mmdeviceCollection)
+                foreach (var device in Devices)
                 {
-                    PlayDevices.Add(device);
-                    PreviewDevices.Add(device);
-                    Debug.WriteLine(device.ToString());
+                    string FN = mmdeviceCollection.Where(d => d.FriendlyName.Contains(device.ProductName)).Select( dd=> dd.FriendlyName).FirstOrDefault();
+                    if (string.IsNullOrEmpty(FN)) FN = device.ProductName;
+                    PlayDevices.Add(FN);
+                    PreviewDevices.Add(FN);
+                    Debug.WriteLine(FN);
                 }
             }
 
@@ -333,9 +335,9 @@ namespace SFXPlayer
             //Normal playback device
             InitialisingDevices = true;
             cbPlayback.DataSource = PlayDevices;
-            cbPlayback.DisplayMember = "FriendlyName";
-            cbPlayback.ValueMember = "ID";
-            MMDevice mmDev = PlayDevices.Where(dev => dev.FriendlyName == Settings.Default.LastPlaybackDevice).FirstOrDefault();
+            //cbPlayback.DisplayMember = "FriendlyName";
+            //cbPlayback.ValueMember = "ID";
+            string mmDev = PlayDevices.Where(dev => dev == Settings.Default.LastPlaybackDevice).FirstOrDefault();
             if (mmDev != null)
             {
                 if (cbPlayback.Items.Contains(mmDev))
@@ -351,9 +353,9 @@ namespace SFXPlayer
 
             //Preview playback device
             cbPreview.DataSource = PreviewDevices;
-            cbPreview.DisplayMember = "FriendlyName";
-            cbPreview.ValueMember = "ID";
-            mmDev = PreviewDevices.Where(dev => dev.FriendlyName == Settings.Default.LastPreviewDevice).FirstOrDefault();
+            //cbPreview.DisplayMember = "FriendlyName";
+            //cbPreview.ValueMember = "ID";
+            mmDev = PreviewDevices.Where(dev => dev == Settings.Default.LastPreviewDevice).FirstOrDefault();
             if (mmDev != null)
             {
                 if (cbPreview.Items.Contains(mmDev))
@@ -369,7 +371,16 @@ namespace SFXPlayer
 
             if (MidiOut.NumberOfDevices > 0)
             {
+                for (int i = 0; i < MidiOut.NumberOfDevices; i++)
+                {
+                    Debug.WriteLine(MidiOut.DeviceInfo(i).ProductName);
+                }
                 MIDIOut = new MidiOut(MidiOut.NumberOfDevices - 1);     //the last one should be OK, skips internal synth
+            }
+            else
+            {
+                MessageBox.Show("No External MIDI Devices found");
+                Debug.WriteLine("not found " + Settings.Default.LastMidiDevice);
             }
 
             InitialisingDevices = false;
@@ -407,8 +418,8 @@ namespace SFXPlayer
             {
                 foreach (var device in mmdeviceCollection)
                 {
-                    PlayDevices.Add(device);
-                    PreviewDevices.Add(device);
+                    PlayDevices.Add(device.FriendlyName);
+                    PreviewDevices.Add(device.FriendlyName);
                     Debug.WriteLine(device.ToString());
                 }
             }
@@ -1345,7 +1356,7 @@ namespace SFXPlayer
         private void cbPlayback_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (InitialisingDevices) return;
-            Settings.Default.LastPlaybackDevice = ((MMDevice)cbPlayback.SelectedItem).DeviceFriendlyName;
+            Settings.Default.LastPlaybackDevice = (string)cbPlayback.SelectedItem;
             Settings.Default.Save();
             Debug.WriteLine(Settings.Default.LastPlaybackDevice);
             ResetDisplay();
@@ -1361,7 +1372,7 @@ namespace SFXPlayer
         {
             if (InitialisingDevices) return;
             Debug.WriteLine(cbPreview.SelectedIndex.ToString() + ": " + cbPreview.SelectedValue.ToString() + " ~ " + cbPreview.SelectedItem.ToString());
-            Settings.Default.LastPreviewDevice = ((MMDevice)cbPreview.SelectedItem).DeviceFriendlyName;
+            Settings.Default.LastPreviewDevice = (string)cbPreview.SelectedItem;
             Settings.Default.Save();
             Debug.WriteLine(Settings.Default.LastPreviewDevice);
         }

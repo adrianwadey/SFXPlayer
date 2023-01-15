@@ -721,6 +721,7 @@ namespace SFXPlayer
         {
             TimeStamper timeStamper = new TimeStamper();
             timeStamper.Edit(SFX);
+            UpdateButtons();
         }
 
         int _LastTrigger = 0;
