@@ -8,11 +8,12 @@ Sound Effects Player for theatrical use.
 
 by Adrian Wadey
 
-Latest release 1.1.0.1
+Latest release 2.0.0.5
 
 ![Screenshot](SFXPlayer/SFXPlayer/SFXPlayer.PNG)
 
-# A new version is on the way that includes remote control from your phone.
+Includes MIDI output to trigger lighting changes during music playback or Pyros during spells - or use your imagination.
+![Screenshot](SFXPlayer/SFXPlayer/TimeStamper.PNG)
 
 ### Build from source
 
@@ -25,8 +26,9 @@ project -> Manage Nugets -> restore from online sources
 ## Instructions for use
 
 *    Click + to add a cue
-*    Click the "F" File button and choose the sound file. Click "F" again to remove the file
+*    Click the File button and choose the sound file. Click again to remove the file
 *    Click the text box on the cue and change the text as needed
+*    Click the stopwatch button to edit MIDI trigger points
 *    F5 to Play, F4 or Esc to stop all
 *    Multiple simultaneous sounds
 *    There are two additional large text boxes top/bottom left that only shows for the 
