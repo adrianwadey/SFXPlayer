@@ -13,7 +13,8 @@ Latest release 2.0.0.5
 ![Screenshot](SFXPlayer/SFXPlayer/SFXPlayer.PNG)
 
 Includes MIDI output to trigger lighting changes during music playback or Pyros during spells - or use your imagination.
-![Screenshot](SFXPlayer/SFXPlayer/TimeStamper.PNG)
+
+![Screenshot](SFXPlayer/SFXPlayer/TimeStamper.png)
 
 ### Build from source
 
