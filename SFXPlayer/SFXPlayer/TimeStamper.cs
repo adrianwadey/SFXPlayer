@@ -31,7 +31,33 @@ namespace SFXPlayer
 
         private void TimeStamper_Load(object sender, EventArgs e)
         {
-            pictureBox1_SizeChanged(this, EventArgs.Empty);
+            try
+            {
+                var maxPeakProvider = new MaxPeakProvider();
+                //var rmsPeakProvider = new RmsPeakProvider(200); // e.g. 200
+                var samplingPeakProvider = new SamplingPeakProvider(200); // e.g. 200
+                var averagePeakProvider = new AveragePeakProvider(4); // e.g. 4
+                var myRendererSettings = new StandardWaveFormRendererSettings();
+                myRendererSettings.Width = Screen.AllScreens.Select(s => s.Bounds.Width).Max();
+                myRendererSettings.BottomHeight = myRendererSettings.TopHeight = (pictureBox1.Height - pictureBox1.Padding.Vertical) / 2 - 2;
+                var renderer = new WaveFormRenderer();
+                using (var waveStream = new AudioFileReader(SFX.FileName))
+                {
+                    WaveLength = waveStream.TotalTime;
+                    Length.Text = WaveLength.ToString(@"mm\:ss\.ff");
+                    pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
+                    pictureBox1.BackgroundImage = renderer.Render(waveStream, maxPeakProvider, myRendererSettings);
+                    bm = new Bitmap(pictureBox1.BackgroundImage.Width, pictureBox1.BackgroundImage.Height);
+                    pictureBox1.Image = bm;
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Something went wrong");
+                this.Close();
+            }
+
+
             listBox1.DataSource = SFX.Triggers;
             SFX.Triggers.ListChanged += Triggers_ListChanged;
             //listBox1.DisplayMember = nameof(Trigger.Description);
@@ -87,7 +113,8 @@ namespace SFXPlayer
         }
         private void RedrawTriggers()
         {
-            bm = new Bitmap(pictureBox1.BackgroundImage.Width, pictureBox1.BackgroundImage.Height);
+            trackBar1.Maximum = pictureBox1.Width - pictureBox1.Padding.Horizontal;
+            bm = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             Graphics g = Graphics.FromImage(bm);
             foreach (var trig in SFX.Triggers)
             {
@@ -115,12 +142,12 @@ namespace SFXPlayer
 
         private int TicksToPosition(long ticks)
         {
-            return (int)(pictureBox1.BackgroundImage.Width * ticks / WaveLength.Ticks);
+            return (int)(pictureBox1.Width * ticks / WaveLength.Ticks);
         }
 
         private long PositionToTicks(int x)
         {
-            return WaveLength.Ticks * x / pictureBox1.BackgroundImage.Width;
+            return WaveLength.Ticks * x / pictureBox1.Width;
         }
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
@@ -136,23 +163,6 @@ namespace SFXPlayer
 
         private void pictureBox1_SizeChanged(object sender, EventArgs e)
         {
-            var maxPeakProvider = new MaxPeakProvider();
-            var rmsPeakProvider = new RmsPeakProvider(200); // e.g. 200
-            var samplingPeakProvider = new SamplingPeakProvider(200); // e.g. 200
-            var averagePeakProvider = new AveragePeakProvider(4); // e.g. 4
-            var myRendererSettings = new StandardWaveFormRendererSettings();
-            myRendererSettings.Width = pictureBox1.Width - pictureBox1.Padding.Horizontal;
-            myRendererSettings.BottomHeight = myRendererSettings.TopHeight = (pictureBox1.Height - pictureBox1.Padding.Vertical) / 2 - 2;
-            var renderer = new WaveFormRenderer();
-            using (var waveStream = new AudioFileReader(SFX.FileName))
-            {
-                WaveLength = waveStream.TotalTime;
-                Length.Text = WaveLength.ToString(@"mm\:ss\.ff");
-                pictureBox1.BackgroundImage = renderer.Render(waveStream, rmsPeakProvider, myRendererSettings);
-                bm = new Bitmap(pictureBox1.BackgroundImage.Width, pictureBox1.BackgroundImage.Height);
-                pictureBox1.Image = bm;
-            }
-            trackBar1.Maximum = myRendererSettings.Width;
             ActiveTrigger = ActiveTrigger;      //force update of movement limits
             RedrawTriggers();
         }

@@ -21,13 +21,15 @@ namespace SFXPlayer
 
         public override void Edit()
         {
-            MIDIBytes = (byte[])SimpleGo.Clone();
+            if (MIDIBytes == null || MIDIBytes.Length == 0) {
+                MIDIBytes = (byte[])SimpleGo.Clone();
+            }
             MSCEventEditor.Edit(this);
         }
 
         public override void Execute()
         {
-            Debug.WriteLine(BitConverter.ToString(SimpleGo));
+            if (MIDIBytes != null) Debug.WriteLine("[" + BitConverter.ToString(MIDIBytes) + "]");
             if (Program.mainForm.MIDIOut != null)
             {
                 if (MIDIBytes!=null && MIDIBytes.Any())
@@ -45,25 +47,37 @@ namespace SFXPlayer
         {
             get
             {
-                if (MIDIBytes == null || MIDIBytes.Length == 0) return "";
-                return BitConverter.ToString(MIDIBytes).Replace("-", ",");
+                return ByteArrayToCSV(MIDIBytes);
             }
             set
             {
-                string[] bytes = value.Replace(" ", "").Split(',');       //replace spaces in case manually edited
-                if (bytes[0].Length == 0)
+                MIDIBytes= CSVToByteArray(value);
+            }
+        }
+
+        public static string ByteArrayToCSV(byte[] bytes)
+        {
+            if (bytes == null || bytes.Length == 0) return "";
+            return BitConverter.ToString(bytes).Replace("-", ",");
+        }
+
+        public static byte[] CSVToByteArray(string CSV)
+        {
+            byte[] result;
+            string[] bytes = CSV.Replace(" ", "").Split(',');       //replace spaces in case manually edited
+            if (bytes[0].Length == 0)
+            {
+                result = null;
+            }
+            else
+            {
+                result = new byte[bytes.Length];
+                for (int i = 0; i < bytes.Length; i++)
                 {
-                    MIDIBytes = null;
-                }
-                else
-                {
-                    MIDIBytes = new byte[bytes.Length];
-                    for (int i = 0; i < bytes.Length; i++)
-                    {
-                        MIDIBytes[i] = Convert.ToByte(bytes[i], 16);
-                    }
+                    result[i] = Convert.ToByte(bytes[i], 16);
                 }
             }
+            return result;
         }
 
         private static byte[] SimpleGo = { 0xf0, 0x7f, 0x7f, 0x02, 0x01, 0x01, 0xf7 }; //go command

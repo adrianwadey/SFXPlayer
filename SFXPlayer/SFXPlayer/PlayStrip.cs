@@ -1,4 +1,5 @@
-﻿using System;
+﻿using static AJW.General.SVGResources;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -38,7 +39,6 @@ namespace SFXPlayer
         ucVolume volume = new ucVolume();
         public event EventHandler StopAll;
         public event EventHandler<StatusEventArgs> ReportStatus;
-        public static ComboBox Devices;
         int prevPct = -1;
 
         #region Initialisation
@@ -49,23 +49,6 @@ namespace SFXPlayer
             InitialiseButtons();
             InitializeSound();
             SFX = new SFX();
-        }
-
-        private void InitialiseButtons()
-        {
-            UpdateButton(bnVolume, "volume-up-fill.svg");
-            UpdateButton(bnPreview, "headphones.svg");
-            UpdateButton(bnPlay, "play-fill.svg");
-            UpdateButton(bnEdit, "blank.svg");
-        }
-
-        private void UpdateButton(PictureBox Button, string ButtonImageName)
-        {
-            if ((string)Button.Tag != ButtonImageName)
-            {
-                Button.Tag = ButtonImageName;
-                Button.Image = FromSvgResource(ButtonImageName);
-            }
         }
 
         public PlayStrip(SFX SFX) : this()
@@ -87,13 +70,6 @@ namespace SFXPlayer
 
             components = new Container();
             components.Add(_musicPlayer);
-            _musicPlayer.PlaybackStopped += (s, args) =>
-            {
-                //WasapiOut uses SynchronizationContext.Post to raise the event
-                //There might be already a new WasapiOut-instance in the background when the async Post method brings the PlaybackStopped-Event to us.
-                //if (_musicPlayer.PlaybackState != PlaybackState.Stopped)
-                //    btnPlay.Enabled = btnStop.Enabled = btnPause.Enabled = false;
-            };
             _musicPlayer.PlaybackStopped += _musicPlayer_PlaybackStopped;
             components.Add(_PreviewPlayer);
             _PreviewPlayer.PlaybackStopped += _PreviewPlayer_PlaybackStopped;
@@ -205,6 +181,112 @@ namespace SFXPlayer
 
         #endregion
 
+        #region buttonupdates
+        private void InitialiseButtons()
+        {
+            UpdateButtonImage(bnVolume, "volume-up-fill.svg");
+            UpdateButtonImage(bnPreview, "headphones.svg");
+            UpdateButtonImage(bnPlay, "play-fill.svg");
+            UpdateButtonImage(bnEdit, "blank.svg");
+        }
+
+        private void UpdateButtonImage(PictureBox Button, string ButtonImageName)
+        {
+            if ((string)Button.Tag != ButtonImageName)
+            {
+                Button.Tag = ButtonImageName;
+                Button.Image = FromSvgResource(ButtonImageName);
+            }
+        }
+
+        private void UpdateButtons()
+        {
+            UpdateFileButton();
+            UpdateEditButton();
+            UpdatePlayButton();
+            UpdatePreviewButton();
+        }
+
+        private void UpdateFileButton()
+        {
+            if (string.IsNullOrEmpty(SFX.FileName))
+            {
+                UpdateButtonImage(bnFile, "file-music.svg");
+                toolTip1.SetToolTip(bnFile, "Select Sound File");
+            }
+            else if (!File.Exists(SFX.FileName))
+            {
+                UpdateButtonImage(bnFile, "file-earmark-music.svg");
+                toolTip1.SetToolTip(bnFile, "File not found: \"" + SFX.ShortFileName + "\"");
+            }
+            else
+            {
+                UpdateButtonImage(bnFile, "file-earmark-music-fill.svg");
+                toolTip1.SetToolTip(bnFile, "Remove \"" + SFX.ShortFileName + "\"");
+            }
+        }
+
+        private void UpdateEditButton()
+        {
+            if (SFX.Triggers.Any())
+            {
+                UpdateButtonImage(bnEdit, "stopwatch-fill.svg");
+                toolTip1.SetToolTip(bnEdit, $"{SFX.Triggers.Count} event triggers");
+            }
+            else
+            {
+                UpdateButtonImage(bnEdit, "stopwatch.svg");
+                toolTip1.SetToolTip(bnEdit, "Add event triggers");
+            }
+        }
+
+        private void UpdatePlayButton()
+        {
+            if (PlayerState == PlayerState.play)
+            {
+                UpdateButtonImage(bnPlay, "stop-fill.svg");
+                toolTip1.SetToolTip(bnPlay, "Stop");
+            }
+            else
+            {
+                if (!File.Exists(SFX.FileName))
+                {
+                    UpdateButtonImage(bnPlay, "blank.svg");
+                    toolTip1.SetToolTip(bnPlay, "");
+                }
+                else
+                {
+                    UpdateButtonImage(bnPlay, "play-fill.svg");
+                    toolTip1.SetToolTip(bnPlay, "Play");
+                }
+            }
+        }
+
+        private void UpdatePreviewButton()
+        {
+            if (_PreviewPlayer.PlaybackState == PlaybackState.Playing)
+            {
+                //bnPreview.Image = Resources.Stop2_18;
+                UpdateButtonImage(bnPreview, "stop-fill.svg");
+                toolTip1.SetToolTip(bnPreview, "Stop Preview");
+            }
+            else
+            {
+                if (!File.Exists(SFX.FileName))
+                {
+                    UpdateButtonImage(bnPreview, "blank.svg");
+                    toolTip1.SetToolTip(bnPreview, "");
+                }
+                else
+                {
+                    //bnPreview.Image = Resources.Headphones2_18;
+                    UpdateButtonImage(bnPreview, "headphones.svg");
+                    toolTip1.SetToolTip(bnPreview, "Preview");
+                }
+            }
+        }
+        #endregion  //buttonupdates
+
         #region AudioFile
 
         private void bnFile_Click(object sender, EventArgs e)
@@ -238,35 +320,6 @@ namespace SFXPlayer
             ChooseFile();
         }
 
-        private void UpdateButtons()
-        {
-            if (string.IsNullOrEmpty(SFX.FileName))
-            {
-                UpdateButton(bnFile, "file-music.svg");
-                toolTip1.SetToolTip(bnFile, "Select Sound File");
-            }
-            else if (!File.Exists(SFX.FileName))
-            {
-                UpdateButton(bnFile, "file-earmark-music.svg");
-                toolTip1.SetToolTip(bnFile, "File not found: \"" + SFX.ShortFileName + "\"");
-            }
-            else
-            {
-                UpdateButton(bnFile, "file-earmark-music-fill.svg");
-                toolTip1.SetToolTip(bnFile, "Remove \"" + SFX.ShortFileName + "\"");
-            }
-            if (SFX.Triggers.Any())
-            {
-                UpdateButton(bnEdit, "stopwatch-fill.svg");
-            }
-            else
-            {
-                UpdateButton(bnEdit, "stopwatch.svg");
-            }
-            UpdatePlayButton();
-            UpdatePreviewButton();
-        }
-
         public static OpenFileDialog OFD;
 
         private void ChooseFile()
@@ -294,18 +347,15 @@ namespace SFXPlayer
             if (tbDescription.Text == "") tbDescription.Text = SFX.ShortFileNameOnly;
             PlayerState = PlayerState.uninitialised;
             UpdateButtons();
-            if (Settings.Default.PreloadAll)
-            {
-                PreloadFile();
-            }
+            PreloadFile();
         }
 
         internal void PreloadFile()
         {
-            if (PlayerState == PlayerState.uninitialised)
-            {
-                LoadFile();
-            }
+            //if (PlayerState == PlayerState.uninitialised)
+            //{
+            LoadFile();
+            //}
         }
 
         private void LoadFile()
@@ -323,8 +373,7 @@ namespace SFXPlayer
             }
             PlayerState = PlayerState.loading;
             UpdatePlayerState(PlayerState);
-            //var outputDevice = new DirectSoundOut(((DirectSoundDeviceInfo)Devices.SelectedItem).Guid);
-            _musicPlayer.Open(SFX.FileName, Devices.SelectedIndex);
+            _musicPlayer.Open(SFX.FileName, SFXPlayer.CurrentPlaybackDeviceIdx);
             _musicPlayer.Volume = SFX.Volume;
             PlayerState = PlayerState.loaded;
         }
@@ -350,21 +399,6 @@ namespace SFXPlayer
 
         public bool IsPlaying => (PlayerState == PlayerState.play);
 
-        private Bitmap FromSvgResource(string resourcename)
-        {
-            // Determine path
-            var assembly = Assembly.GetExecutingAssembly();
-            string resourcePath;// = resourcename;
-                                // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
-            resourcePath = assembly.GetManifestResourceNames().First(str => str.EndsWith(resourcename));
-
-            using (Stream stream = assembly.GetManifestResourceStream(resourcePath))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                return SvgDocument.FromSvg<SvgDocument>(reader.ReadToEnd()).Draw();
-            }
-
-        }
         private void bnPlay_Click(object sender, EventArgs e)
         {
             try
@@ -388,28 +422,6 @@ namespace SFXPlayer
             }
         }
 
-        private void UpdatePlayButton()
-        {
-            if (PlayerState == PlayerState.play)
-            {
-                UpdateButton(bnPlay, "stop-fill.svg");
-                toolTip1.SetToolTip(bnPlay, "Stop");
-            }
-            else
-            {
-                if (!File.Exists(SFX.FileName))
-                {
-                    UpdateButton(bnPlay, "blank.svg");
-                    toolTip1.SetToolTip(bnPlay, "");
-                }
-                else
-                {
-                    UpdateButton(bnPlay, "play-fill.svg");
-                    toolTip1.SetToolTip(bnPlay, "Play");
-                }
-            }
-        }
-
         private void bnPreview_Click(object sender, EventArgs e)
         {
             if (_PreviewPlayer.PlaybackState == PlaybackState.Playing)
@@ -419,37 +431,13 @@ namespace SFXPlayer
             else
             {
                 if (!File.Exists(SFX.FileName)) return;
-                _PreviewPlayer.Open(SFX.FileName, PreviewDevices.SelectedIndex);
+                _PreviewPlayer.Open(SFX.FileName, SFXPlayer.CurrentPreviewDeviceIdx);
                 _PreviewPlayer.Volume = SFX.Volume; _PreviewPlayer.Position = TimeSpan.Zero;  //this resets the volume!
                 _PreviewPlayer.Volume = SFX.Volume;
                 _PreviewPlayer.Play();
                 BackColor = Settings.Default.ColourPreview;
             }
             UpdatePreviewButton();
-        }
-
-        private void UpdatePreviewButton()
-        {
-            if (_PreviewPlayer.PlaybackState == PlaybackState.Playing)
-            {
-                //bnPreview.Image = Resources.Stop2_18;
-                UpdateButton(bnPreview, "stop-fill.svg");
-                toolTip1.SetToolTip(bnPreview, "Stop Preview");
-            }
-            else
-            {
-                if (!File.Exists(SFX.FileName))
-                {
-                    UpdateButton(bnPreview, "blank.svg");
-                    toolTip1.SetToolTip(bnPreview, "");
-                }
-                else
-                {
-                    //bnPreview.Image = Resources.Headphones2_18;
-                    UpdateButton(bnPreview, "headphones.svg");
-                    toolTip1.SetToolTip(bnPreview, "Preview");
-                }
-            }
         }
 
         private void bnStop_Click(object sender, EventArgs e)
@@ -529,10 +517,10 @@ namespace SFXPlayer
         {
             if (PlayerState == PlayerState.paused || PlayerState == PlayerState.play)
             {
-                _musicPlayer.Volume = 0;    //makes the stop less "clicky"
-                Thread.Sleep(10);
+                //_musicPlayer.Volume = 0;    //makes the stop less "clicky"
+                //Thread.Sleep(10);
                 _musicPlayer.Stop();
-                _musicPlayer.Volume = SFX.Volume;
+                //_musicPlayer.Volume = SFX.Volume;
                 PlayerState = PlayerState.loaded;
                 UpdatePlayButton();
             }
@@ -569,7 +557,6 @@ namespace SFXPlayer
         }
 
         private int Progress = 0;
-        internal static ComboBox PreviewDevices;
 
         private void UpdatePosition(TimeSpan position)
         {
@@ -620,7 +607,7 @@ namespace SFXPlayer
 
         private void bnVolume_Enter(object sender, EventArgs e)
         {
-            if (Form1.lastFocused == volume.Controls[0])
+            if (SFXPlayer.lastFocused == volume.Controls[0])
             {
                 justHidden = true;
             }
@@ -719,9 +706,12 @@ namespace SFXPlayer
 
         private void bnEdit_Click(object sender, EventArgs e)
         {
+            Cursor cursor = Cursor.Current;
+            Cursor = Cursors.WaitCursor;
             TimeStamper timeStamper = new TimeStamper();
             timeStamper.Edit(SFX);
             UpdateButtons();
+            Cursor = cursor;
         }
 
         int _LastTrigger = 0;

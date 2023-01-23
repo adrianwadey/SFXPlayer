@@ -2,6 +2,7 @@
 using NAudio.Wave;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
@@ -9,7 +10,7 @@ namespace AudioPlayerSample
 {
     public class MusicPlayer : Component
     {
-        private WaveOut _soundOut;
+        private WaveOutEvent _soundOut;
         private WaveStream _waveSource;
 
         public event EventHandler<StoppedEventArgs> PlaybackStopped;
@@ -71,9 +72,9 @@ namespace AudioPlayerSample
         public void Open(string filename, int deviceNumber)
         {
             CleanupPlayback();
-
+            Debug.WriteLine($"Open {filename}, {deviceNumber}");
             _waveSource = new AudioFileReader(filename);
-            _soundOut = new WaveOut();
+            _soundOut = new WaveOutEvent();
             _soundOut.DeviceNumber = deviceNumber; // new WaveOutEvent() { DeviceNumber = 1 }; // new WasapiOut(device, AudioClientShareMode.Shared, false, 100);
             _soundOut.Init(_waveSource);
             if (PlaybackStopped != null) _soundOut.PlaybackStopped += PlaybackStopped;
@@ -82,33 +83,37 @@ namespace AudioPlayerSample
         public void Play()
         {
             if (_soundOut != null)
+            {
+                Debug.WriteLine("_soundOut.Init(_waveSource)");
                 _soundOut.Init(_waveSource);
+            }
+            Debug.WriteLine("Play");
             _soundOut.Play();
         }
 
         public void Pause()
         {
             if (_soundOut != null)
+            {
+                Debug.WriteLine("Pause");
                 _soundOut.Pause();
+            }
         }
 
         public void Resume()
         {
             if (_soundOut != null)
+            {
+                Debug.WriteLine("Resume");
                 _soundOut.Play();
+            }
         }
 
         public void Stop()
         {
             if (_soundOut != null)
             {
-                //for (int i = 0; i < 12; i++)
-                //{          //workaround for buffer not being flushed and what's left in the buffer
-                //           //plays when you restart. This assumes first 10ms of track are silent and
-                //           //plays it 12 times (guess based on latency=100)
-                //    _soundOut.WaveSource.Position = 0;
-                //    _soundOut.WaitForStopped(10);
-                //}
+                Debug.WriteLine("Stop");
                 _soundOut.Stop();
             }
         }
@@ -117,11 +122,13 @@ namespace AudioPlayerSample
         {
             if (_soundOut != null)
             {
+                Debug.WriteLine("_soundOut.Dispose");
                 _soundOut.Dispose();
                 _soundOut = null;
             }
             if (_waveSource != null)
             {
+                Debug.WriteLine("_waveSource.Dispose");
                 _waveSource.Dispose();
                 _waveSource = null;
             }

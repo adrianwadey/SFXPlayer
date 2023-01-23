@@ -28,8 +28,8 @@
     <ProductName>SFX Launcher</ProductName>
     <PublisherName>Adrian Wadey</PublisherName>
     <SuiteName>SFX</SuiteName>
-    <ApplicationRevision>2</ApplicationRevision>
-    <ApplicationVersion>1.1.0.%2a</ApplicationVersion>
+    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationVersion>2.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -54,10 +54,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>A89E4582D299C59FA4ACC68CFFC3623F712BA437</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>3362641467EB56FD08481546565B76E905BC3259</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>SFXPlayer_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -69,7 +70,7 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>false</SignManifests>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -153,14 +154,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AudioDeviceNotifications.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FileHandler.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="SFXPlayer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="SFXPlayer.Designer.cs">
+      <DependentUpon>SFXPlayer.cs</DependentUpon>
     </Compile>
     <Compile Include="AbstractShowEvent.cs" />
     <Compile Include="MSCEvent.cs" />
@@ -199,6 +199,7 @@
     <Compile Include="SplashScreen.Designer.cs">
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </Compile>
+    <Compile Include="SVGResources.cs" />
     <Compile Include="TimeStamper.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -220,8 +221,8 @@
     </Compile>
     <Compile Include="WAVSounds.cs" />
     <Compile Include="WebApp.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="SFXPlayer.resx">
+      <DependentUpon>SFXPlayer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PlayStrip.resx">
       <DependentUpon>PlayStrip.cs</DependentUpon>
@@ -293,6 +294,7 @@
     <EmbeddedResource Include="Resources\file-earmark-music.svg" />
     <EmbeddedResource Include="Resources\file-music.svg" />
     <EmbeddedResource Include="Resources\clock-history.svg" />
+    <EmbeddedResource Include="Resources\midi_port_icon_135398.svg" />
     <Content Include="Resources\Play.png" />
     <EmbeddedResource Include="Resources\stop-fill.svg" />
     <EmbeddedResource Include="Resources\volume-mute-fill.svg" />

@@ -1,4 +1,5 @@
 ﻿using AJW.General;
+using static AJW.General.SVGResources;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 using NAudio.Midi;
@@ -15,16 +16,31 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
+using System.Management;
+using System.Runtime.InteropServices;
+using Svg.FilterEffects;
 
 namespace SFXPlayer
 {
-    public partial class Form1 : Form
+    public partial class SFXPlayer : Form
     {
         const int TOPPLACEHOLDER = -1;
         const int BOTTOMPLACEHOLDER = -2;
         const string FileExtensions = "SFX Cue Files (*.sfx)|*.sfx";
         private bool InitialisingDevices = false;
         private XMLFileHandler<Show> ShowFileHandler = new XMLFileHandler<Show>();
+        private const int WM_DEVICECHANGE = 0x0219;
+
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == WM_DEVICECHANGE)
+            {
+                DeviceChangeTimer.Stop();       //force a restart
+                DeviceChangeTimer.Start();
+            }
+            base.WndProc(ref m);
+        }
+
         private Show _CurrentShow;
         private Show CurrentShow
         {
@@ -63,12 +79,10 @@ namespace SFXPlayer
         private readonly ObservableCollection<string> PlayDevices = new ObservableCollection<string>();
         private readonly ObservableCollection<string> PreviewDevices = new ObservableCollection<string>();
         private MMDeviceEnumerator deviceEnum = new MMDeviceEnumerator();
-        private AudioDeviceNotifications audioDeviceNotifications;
-        private IMMNotificationClient notifyClient;
         public static Control lastFocused;
         string[] filters;
 
-        public Form1()
+        public SFXPlayer()
         {
             // Initialize Forms Designer generated code.
             InitializeComponent();
@@ -76,9 +90,7 @@ namespace SFXPlayer
             // Set up the status bar and other controls.
             InitializeControls();
 
-            // Set up the SoundPlayer object.
-            InitializeSound();
-
+            DeviceChangeTimer.Start();      //trigger a reload of the available audio/MIDI devices
         }
 
         // Sets up the status bar and other controls.
@@ -92,7 +104,9 @@ namespace SFXPlayer
             //panel.AutoSize = StatusBarPanelAutoSize.Spring;
             //this.statusBar.ShowPanels = true;
             //this.statusBar.Panels.Add(panel);
-            ReportStatus("Ready.");
+            //cbPlayback.DataSource = PlayDevices;
+            //cbPreview.DataSource = PreviewDevices;
+
 
             ShowFileHandler.FileExtensions = FileExtensions;
             //cuelistFormSpacing = this.Height - CueList.Height;
@@ -113,29 +127,9 @@ namespace SFXPlayer
             rtMainText.Top = bnStopAll.Bottom + rtMainText.Margin.Top + bnStopAll.Margin.Bottom;
             rtMainText.Height = Math.Min(statusStrip.Top - rtMainText.Margin.Bottom - rtMainText.Top, rtPrevMainText.Height);
             PlayStrip.OFD = dlgOpenAudioFile;
-            PlayStrip.Devices = cbPlayback;
-            PlayStrip.PreviewDevices = cbPreview;
+            //PlayStrip.Devices = cbPlayback;
+            //PlayStrip.PreviewDevices = cbPreview;
             autoLoadLastsfxCuelistToolStripMenuItem.Checked = Settings.Default.AutoLoadLastSession;
-        }
-
-        // Sets up the SoundPlayer object.
-        private void InitializeSound()
-        {
-            // Create an instance of the SoundPlayer class.
-            //player = new SoundPlayer();
-
-            // Listen for the LoadCompleted event.
-            //player.LoadCompleted += new AsyncCompletedEventHandler(player_LoadCompleted);
-
-            // Listen for the SoundLocationChanged event.
-            //player.SoundLocationChanged += new EventHandler(player_LocationChanged);
-
-            //set up list of file extensions for checking dragndrop files
-            //filters = CodecFactory.SupportedFilesFilterEn.Split(new char[] { '|' });
-            //filters = filters[1].Split(new char[] { ';' });
-            //for (int i = 0; i < filters.Length; i++) {
-            //    filters[i] = filters[i].Substring(1).ToUpper();
-            //}
         }
 
         // Convenience method for setting message text in 
@@ -242,11 +236,12 @@ namespace SFXPlayer
         {
             Debug.WriteLine("Form1_Load");
             StartWebApp();
-            mnuPreloadAll.Checked = Settings.Default.PreloadAll;
             ShowFileHandler.FileTitleUpdate += UpdateTitleBar;
             //Insert = new PlayStrip() { Width = 100, BackColor = Color.Blue, isPlaceholder = false };
-
-            InitialiseDevices();
+            bnMIDI.Image = FromSvgResource("midi_port_icon_135398.svg");
+            bnPreview.Image = FromSvgResource("headphones.svg");
+            bnPlayback.Image = FromSvgResource("volume-up-fill.svg");
+            UpdateDevices();
 
             ProgressTimer.Enabled = true;
             string[] args = Environment.GetCommandLineArgs();
@@ -279,10 +274,7 @@ namespace SFXPlayer
                 }
             }
             ResetDisplay();
-            if (mnuPreloadAll.Checked)
-            {
-                PreloadAll();
-            }
+            PreloadAll();
 
             //Form1_Resize(this, new EventArgs());
             //MouseWheel += CueList_MouseWheel;
@@ -295,94 +287,166 @@ namespace SFXPlayer
             UpdateWebApp();
         }
 
-        private void InitialiseDevices()
+        List<string> AudioOutDevices = new List<string>();
+        List<string> CurrentAudioOutDevices = new List<string>();
+        List<string> CurrentMIDIOutDevices = new List<string>();
+        public static int CurrentPlaybackDeviceIdx = -1;
+        public static int CurrentPreviewDeviceIdx = -1;
+        public static int CurrentMIDIDeviceIdx = -1;
+
+        private void UpdateDevices()
         {
-            //get the sound devices
-            //string[] DevNamesFull = DirectSoundOut.Devices.Select(d=>d.Description).ToArray();
-            //for (int n = -1; n < WaveOut.DeviceCount; n++)
-            //{
-            //    var caps = WaveOut.GetCapabilities(n);
-            //    Debug.WriteLine($"{n}: {caps.ProductName}");
-            //}
-            List<WaveOutCapabilities> Devices = new List<WaveOutCapabilities>();
+            //something changed, so get a new list of devices
+            //check whether output audio device is still in the list
 
-            Debug.WriteLine("waveout devices:");
-            for (int n = 0; n < WaveOut.DeviceCount; n++)
-            {
-                var caps = WaveOut.GetCapabilities(n);
-                Devices.Add(caps);
-                Debug.WriteLine($"{n}: {caps.ProductName}");
-            }
-            Debug.WriteLine("mm devices:");
+            //WaveOut gives us truncated names but the index we need to open the device
+            //combine these with the full names from mmdevices to populate the device list
+            //add/remove devices so that we don't reset the list
 
-            var mmdeviceCollection = deviceEnum.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-            {
-                foreach (var device in Devices)
+            AudioOutDevices.Clear();
+            {   //fill in AudioOutDevices
+                List<WaveOutCapabilities> WaveOutDevices = new List<WaveOutCapabilities>();
+
+                for (int n = 0; n < WaveOut.DeviceCount; n++)
                 {
-                    string FN = mmdeviceCollection.Where(d => d.FriendlyName.Contains(device.ProductName)).Select( dd=> dd.FriendlyName).FirstOrDefault();
+                    WaveOutDevices.Add(WaveOut.GetCapabilities(n));
+                }
+
+                var mmdeviceCollection = deviceEnum.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+                foreach (var device in WaveOutDevices)
+                {
+                    string FN = mmdeviceCollection.Where(d => d.FriendlyName.Contains(device.ProductName)).Select(dd => dd.FriendlyName).FirstOrDefault();
                     if (string.IsNullOrEmpty(FN)) FN = device.ProductName;
-                    PlayDevices.Add(FN);
-                    PreviewDevices.Add(FN);
+                    AudioOutDevices.Add(FN);
                     Debug.WriteLine(FN);
                 }
             }
 
-            audioDeviceNotifications = new AudioDeviceNotifications();
-            audioDeviceNotifications.AudioDevicesChanged += AudioDeviceNotifications_AudioDevicesChanged;
-            notifyClient = audioDeviceNotifications;
-            deviceEnum.RegisterEndpointNotificationCallback(notifyClient);
-
-            //Normal playback device
-            InitialisingDevices = true;
-            cbPlayback.DataSource = PlayDevices;
-            //cbPlayback.DisplayMember = "FriendlyName";
-            //cbPlayback.ValueMember = "ID";
-            string mmDev = PlayDevices.Where(dev => dev == Settings.Default.LastPlaybackDevice).FirstOrDefault();
-            if (mmDev != null)
+            if (!AudioOutDevices.SequenceEqual(CurrentAudioOutDevices))
             {
-                if (cbPlayback.Items.Contains(mmDev))
-                {
-                    Debug.WriteLine("found");
-                    cbPlayback.SelectedItem = mmDev;
-                }
+                CurrentAudioOutDevices = new List<string>(AudioOutDevices);
+                cbPlayback.Items.Clear();
+                cbPlayback.Items.AddRange(CurrentAudioOutDevices.ToArray());
+                cbPreview.Items.Clear();
+                cbPreview.Items.AddRange(CurrentAudioOutDevices.ToArray());
+            }
+
+            //MAIN OUTPUT
+            int currentSelection = CurrentPlaybackDeviceIdx;
+            if (CurrentAudioOutDevices.Contains(Settings.Default.LastPlaybackDevice))
+            {
+                CurrentPlaybackDeviceIdx = CurrentAudioOutDevices.IndexOf(Settings.Default.LastPlaybackDevice);
             }
             else
             {
-                Debug.WriteLine("not found " + Settings.Default.LastPlaybackDevice);
+                CurrentPlaybackDeviceIdx = -1;      //device not available
             }
-
-            //Preview playback device
-            cbPreview.DataSource = PreviewDevices;
-            //cbPreview.DisplayMember = "FriendlyName";
-            //cbPreview.ValueMember = "ID";
-            mmDev = PreviewDevices.Where(dev => dev == Settings.Default.LastPreviewDevice).FirstOrDefault();
-            if (mmDev != null)
+            if (CurrentPlaybackDeviceIdx >= 0)
             {
-                if (cbPreview.Items.Contains(mmDev))
-                {
-                    Debug.WriteLine("found");
-                    cbPreview.SelectedItem = mmDev;
-                }
+                //Handle any device change stuff here!
+                bnPlayback.BackColor = Color.FromArgb(0, 192, 0);
+                bnPlayback.ToolTipText = Settings.Default.LastPlaybackDevice;
+                cbPlayback.SelectedIndex = CurrentPlaybackDeviceIdx;
             }
             else
             {
-                Debug.WriteLine("not found " + Settings.Default.LastPreviewDevice);
+                //Handle any device change stuff here!
+                bnPlayback.BackColor = Color.Red;
+                bnPlayback.ToolTipText = $"Not connected ({Settings.Default.LastPlaybackDevice})";
+                cbPlayback.SelectedIndex = CurrentPlaybackDeviceIdx;
+            }
+            if (currentSelection != CurrentPlaybackDeviceIdx)
+            {
+                //update playstrips with new output device
+                PreloadAll();
             }
 
-            if (MidiOut.NumberOfDevices > 0)
+            //PREVIEW OUTPUT
+            currentSelection = CurrentPreviewDeviceIdx;
+            if (CurrentAudioOutDevices.Contains(Settings.Default.LastPreviewDevice))
             {
-                for (int i = 0; i < MidiOut.NumberOfDevices; i++)
-                {
-                    Debug.WriteLine(MidiOut.DeviceInfo(i).ProductName);
-                }
-                MIDIOut = new MidiOut(MidiOut.NumberOfDevices - 1);     //the last one should be OK, skips internal synth
+                CurrentPreviewDeviceIdx = CurrentAudioOutDevices.IndexOf(Settings.Default.LastPreviewDevice);
             }
             else
             {
-                MessageBox.Show("No External MIDI Devices found");
-                Debug.WriteLine("not found " + Settings.Default.LastMidiDevice);
+                CurrentPreviewDeviceIdx = -1;      //device not available
+            }
+            if (CurrentPreviewDeviceIdx >= 0)
+            {
+                //Handle any device change stuff here!
+                bnPreview.BackColor = Color.FromArgb(0, 192, 0);
+                bnPreview.ToolTipText = Settings.Default.LastPreviewDevice;
+                cbPreview.SelectedIndex = CurrentPreviewDeviceIdx;
+            }
+            else
+            {
+                //Handle any device change stuff here!
+                bnPreview.BackColor = Color.Red;
+                bnPreview.ToolTipText = $"Not connected ({Settings.Default.LastPreviewDevice})";
+                cbPreview.SelectedIndex = CurrentPreviewDeviceIdx;
+            }
+            if (currentSelection != CurrentPreviewDeviceIdx)
+            {
+                //update playstrips with new preview device
+                //not needed
             }
 
+            var MIDIOutDevices = new List<string>();
+            for (int i = 0; i < MidiOut.NumberOfDevices; i++)
+            {
+                MIDIOutDevices.Add(MidiOut.DeviceInfo(i).ProductName);
+                Debug.WriteLine(MidiOut.DeviceInfo(i).ProductName);
+            }
+
+            if (!MIDIOutDevices.SequenceEqual(CurrentMIDIOutDevices))
+            {
+                CurrentMIDIOutDevices = new List<string>(MIDIOutDevices);
+                cbMIDI.Items.Clear();
+                cbMIDI.Items.AddRange(CurrentMIDIOutDevices.ToArray());
+            }
+
+            //MIDI OUTPUT
+            currentSelection = CurrentMIDIDeviceIdx;
+            if (CurrentMIDIOutDevices.Contains(Settings.Default.LastMidiDevice))
+            {
+                CurrentMIDIDeviceIdx = CurrentMIDIOutDevices.IndexOf(Settings.Default.LastMidiDevice);
+            }
+            else
+            {
+                CurrentMIDIDeviceIdx = -1;      //device not available
+            }
+
+            if (CurrentMIDIDeviceIdx >= 0)
+            {
+                //Handle any device change stuff here!
+                bnMIDI.BackColor = Color.FromArgb(0, 192, 0);
+                bnMIDI.ToolTipText = Settings.Default.LastMidiDevice;
+                cbMIDI.SelectedIndex = CurrentMIDIDeviceIdx;
+            }
+            else
+            {
+                //Handle any device change stuff here!
+                bnMIDI.BackColor = Color.Red;
+                bnMIDI.ToolTipText = $"Not connected ({Settings.Default.LastMidiDevice})";
+                cbMIDI.SelectedIndex = CurrentMIDIDeviceIdx;
+            }
+            if (currentSelection != CurrentMIDIDeviceIdx)
+            {
+                //update playstrips with new MIDI Out device
+                if (CurrentMIDIDeviceIdx == -1)
+                {
+                    if (MIDIOut != null)
+                    {
+                        MIDIOut.Close();
+                        MIDIOut.Dispose();
+                        MIDIOut = null;
+                    }
+                }
+                if (CurrentMIDIDeviceIdx != -1)
+                {
+                    MIDIOut = new MidiOut(CurrentMIDIDeviceIdx);
+                }
+            }
             InitialisingDevices = false;
         }
         public MidiOut MIDIOut;
@@ -994,7 +1058,7 @@ namespace SFXPlayer
                         //ShowFolder = Path.Combine(ShowFolder, Path.GetFileNameWithoutExtension(ofdArch.FileName));
                         //Directory.CreateDirectory(ShowFolder);
                     }
-                    string ExtractedShow = SFXPlayer.Show.ExtractArchive(ofdArch.FileName, ShowFolder);
+                    string ExtractedShow = global::SFXPlayer.Show.ExtractArchive(ofdArch.FileName, ShowFolder);
                     if (!string.IsNullOrEmpty(ExtractedShow) && File.Exists(ExtractedShow))
                     {
                         ReportStatus("Show extracted to " + ExtractedShow);
@@ -1353,28 +1417,10 @@ namespace SFXPlayer
                             "then choose Sound Scheme: No Sounds", Application.ProductName);
         }
 
-        private void cbPlayback_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (InitialisingDevices) return;
-            Settings.Default.LastPlaybackDevice = (string)cbPlayback.SelectedItem;
-            Settings.Default.Save();
-            Debug.WriteLine(Settings.Default.LastPlaybackDevice);
-            ResetDisplay();
-        }
-
         private void autoLoadLastsfxCuelistToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Settings.Default.AutoLoadLastSession = autoLoadLastsfxCuelistToolStripMenuItem.Checked;
             Settings.Default.Save();
-        }
-
-        private void cbPreview_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (InitialisingDevices) return;
-            Debug.WriteLine(cbPreview.SelectedIndex.ToString() + ": " + cbPreview.SelectedValue.ToString() + " ~ " + cbPreview.SelectedItem.ToString());
-            Settings.Default.LastPreviewDevice = (string)cbPreview.SelectedItem;
-            Settings.Default.Save();
-            Debug.WriteLine(Settings.Default.LastPreviewDevice);
         }
 
         private void previousCueToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1404,15 +1450,6 @@ namespace SFXPlayer
             }
         }
 
-        private void mnuPreloadAll_Click(object sender, EventArgs e)
-        {
-            Settings.Default.PreloadAll = mnuPreloadAll.Checked;
-            Settings.Default.Save();
-            if (mnuPreloadAll.Checked)
-            {
-                PreloadAll();
-            }
-        }
         private delegate void SafeCommandDelegate();
 
         internal void PlayNextCue()
@@ -1494,6 +1531,114 @@ namespace SFXPlayer
         private void WebLink_Click(object sender, EventArgs e)
         {
             Process.Start(WebLink.Text);
+        }
+
+        private void bnMIDI_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //private void DeviceInsertedEvent(object sender, EventArrivedEventArgs e)
+        //{
+        //    ManagementBaseObject instance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
+        //    foreach (var property in instance.Properties)
+        //    {
+        //        Console.WriteLine(property.Name + " = " + property.Value);
+        //    }
+        //}
+
+        //private void DeviceRemovedEvent(object sender, EventArrivedEventArgs e)
+        //{
+        //    ManagementBaseObject instance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
+        //    foreach (var property in instance.Properties)
+        //    {
+        //        Console.WriteLine(property.Name + " = " + property.Value);
+        //    }
+        //}
+
+        //private void bwDeviceMonitor_DoWork(object sender, DoWorkEventArgs e)
+        //{
+        //    WqlEventQuery insertQuery = new WqlEventQuery("SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_USBHub'");
+
+        //    ManagementEventWatcher insertWatcher = new ManagementEventWatcher(insertQuery);
+        //    insertWatcher.EventArrived += new EventArrivedEventHandler(DeviceInsertedEvent);
+        //    insertWatcher.Start();
+
+        //    WqlEventQuery removeQuery = new WqlEventQuery("SELECT * FROM __InstanceDeletionEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_USBHub'");
+        //    ManagementEventWatcher removeWatcher = new ManagementEventWatcher(removeQuery);
+        //    removeWatcher.EventArrived += new EventArrivedEventHandler(DeviceRemovedEvent);
+        //    removeWatcher.Start();
+
+        //    // Do something while waiting for events
+        //    System.Threading.Thread.Sleep(20000000);
+        //}
+
+        private void DeviceChangeTimer_Tick(object sender, EventArgs e)
+        {
+            DeviceChangeTimer.Enabled = false;
+            //a device has changed, check the audio & midi interfaces
+            Debug.WriteLine("Device Changed");
+            UpdateDevices();
+        }
+
+        private void cbPlayback_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (CurrentPlaybackDeviceIdx != cbPlayback.SelectedIndex)
+            {
+                if (cbPlayback.SelectedIndex != -1)
+                {
+                    if (Settings.Default.LastPlaybackDevice != (string)cbPlayback.SelectedItem)
+                    {
+                        Settings.Default.LastPlaybackDevice = (string)cbPlayback.SelectedItem;
+                        Settings.Default.Save();
+                        UpdateDevices();
+                    }
+                }
+                else
+                {
+                    UpdateDevices();
+                }
+            }
+        }
+
+        private void cbPreview_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (CurrentPreviewDeviceIdx != cbPreview.SelectedIndex)
+            {
+                if (cbPreview.SelectedIndex != -1)
+                {
+                    if (Settings.Default.LastPreviewDevice != (string)cbPreview.SelectedItem)
+                    {
+                        Settings.Default.LastPreviewDevice = (string)cbPreview.SelectedItem;
+                        Settings.Default.Save();
+                        UpdateDevices();
+                    }
+                }
+                else
+                {
+                    UpdateDevices();
+                }
+            }
+        }
+
+        private void cbMIDI_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (CurrentMIDIDeviceIdx != cbMIDI.SelectedIndex)
+            {
+                if (cbMIDI.SelectedIndex != -1)
+                {
+                    if (Settings.Default.LastMidiDevice != (string)cbMIDI.SelectedItem)
+                    {
+                        Settings.Default.LastMidiDevice = (string)cbMIDI.SelectedItem;
+                        Settings.Default.Save();
+                        UpdateDevices();
+                    }
+                }
+                else
+                {
+                    UpdateDevices();
+                }
+            }
         }
     }
 

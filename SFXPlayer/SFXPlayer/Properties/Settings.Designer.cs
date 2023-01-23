@@ -61,7 +61,7 @@ namespace SFXPlayer.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("PaleGreen")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0, 192, 0")]
         public global::System.Drawing.Color ColourPlayerPlay {
             get {
                 return ((global::System.Drawing.Color)(this["ColourPlayerPlay"]));
@@ -188,18 +188,6 @@ namespace SFXPlayer.Properties {
             }
             set {
                 this["LastPlaybackDevice"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool PreloadAll {
-            get {
-                return ((bool)(this["PreloadAll"]));
-            }
-            set {
-                this["PreloadAll"] = value;
             }
         }
         

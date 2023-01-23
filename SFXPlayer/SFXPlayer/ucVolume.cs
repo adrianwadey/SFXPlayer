@@ -37,7 +37,7 @@ namespace SFXPlayer {
         }
 
         private void tbVolume_Enter(object sender, EventArgs e) {
-            ((Form1)TopLevelControl).ScrollTimer.Enabled = true;
+            ((SFXPlayer)TopLevelControl).ScrollTimer.Enabled = true;
         }
     }
 }

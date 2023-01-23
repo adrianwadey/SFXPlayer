@@ -1,5 +1,7 @@
-﻿namespace SFXPlayer {
-    partial class Form1 {
+﻿namespace SFXPlayer
+{
+    partial class SFXPlayer
+    {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -9,8 +11,10 @@
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing) {
-            if (disposing && (components != null)) {
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
                 components.Dispose();
             }
             base.Dispose(disposing);
@@ -22,14 +26,13 @@
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent() {
+        private void InitializeComponent()
+        {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SFXPlayer));
             this.CueList = new System.Windows.Forms.TableLayoutPanel();
             this.dlgOpenAudioFile = new System.Windows.Forms.OpenFileDialog();
-            this.cbPlayback = new System.Windows.Forms.ComboBox();
             this.rtMainText = new System.Windows.Forms.RichTextBox();
-            this.cbPreview = new System.Windows.Forms.ComboBox();
             this.bnStopAll = new System.Windows.Forms.Button();
             this.ProgressTimer = new System.Windows.Forms.Timer(this.components);
             this.bnPlayNext = new System.Windows.Forms.Button();
@@ -55,11 +58,8 @@
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autoLoadLastsfxCuelistToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.mnuPreloadAll = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ScrollTimer = new System.Windows.Forms.Timer(this.components);
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.bnPrev = new System.Windows.Forms.Button();
             this.bnNext = new System.Windows.Forms.Button();
             this.rtPrevMainText = new System.Windows.Forms.RichTextBox();
@@ -68,10 +68,19 @@
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusBar = new System.Windows.Forms.ToolStripStatusLabel();
             this.WebLink = new System.Windows.Forms.ToolStripStatusLabel();
+            this.DeviceChangeTimer = new System.Windows.Forms.Timer(this.components);
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.bnMIDI = new System.Windows.Forms.ToolStripDropDownButton();
+            this.cbMIDI = new System.Windows.Forms.ToolStripComboBox();
+            this.bnPreview = new System.Windows.Forms.ToolStripDropDownButton();
+            this.cbPreview = new System.Windows.Forms.ToolStripComboBox();
+            this.bnPlayback = new System.Windows.Forms.ToolStripDropDownButton();
+            this.cbPlayback = new System.Windows.Forms.ToolStripComboBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.statusStrip.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // CueList
@@ -83,9 +92,9 @@
             this.CueList.AutoScroll = true;
             this.CueList.BackColor = System.Drawing.SystemColors.ControlDark;
             this.CueList.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 556F));
-            this.CueList.Location = new System.Drawing.Point(305, 27);
+            this.CueList.Location = new System.Drawing.Point(305, 34);
             this.CueList.Name = "CueList";
-            this.CueList.Size = new System.Drawing.Size(556, 401);
+            this.CueList.Size = new System.Drawing.Size(556, 394);
             this.CueList.TabIndex = 4;
             this.CueList.Scroll += new System.Windows.Forms.ScrollEventHandler(this.CueList_Scroll);
             this.CueList.ClientSizeChanged += new System.EventHandler(this.CueList_ClientSizeChanged);
@@ -101,16 +110,6 @@
             // 
             this.dlgOpenAudioFile.FileName = "openFileDialog1";
             // 
-            // cbPlayback
-            // 
-            this.cbPlayback.DropDownWidth = 250;
-            this.cbPlayback.FormattingEnabled = true;
-            this.cbPlayback.Location = new System.Drawing.Point(345, 3);
-            this.cbPlayback.Name = "cbPlayback";
-            this.cbPlayback.Size = new System.Drawing.Size(183, 21);
-            this.cbPlayback.TabIndex = 9;
-            this.cbPlayback.SelectedIndexChanged += new System.EventHandler(this.cbPlayback_SelectedIndexChanged);
-            // 
             // rtMainText
             // 
             this.rtMainText.Location = new System.Drawing.Point(12, 244);
@@ -119,16 +118,6 @@
             this.rtMainText.TabIndex = 2;
             this.rtMainText.Text = "";
             this.rtMainText.TextChanged += new System.EventHandler(this.rtMainText_TextChanged);
-            // 
-            // cbPreview
-            // 
-            this.cbPreview.DropDownWidth = 250;
-            this.cbPreview.FormattingEnabled = true;
-            this.cbPreview.Location = new System.Drawing.Point(655, 3);
-            this.cbPreview.Name = "cbPreview";
-            this.cbPreview.Size = new System.Drawing.Size(183, 21);
-            this.cbPreview.TabIndex = 8;
-            this.cbPreview.SelectedIndexChanged += new System.EventHandler(this.cbPreview_SelectedIndexChanged);
             // 
             // bnStopAll
             // 
@@ -183,15 +172,17 @@
             // 
             // menuStrip1
             // 
+            this.menuStrip1.Dock = System.Windows.Forms.DockStyle.None;
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.transportToolStripMenuItem,
             this.settingsToolStripMenuItem,
             this.helpToolStripMenuItem});
+            this.menuStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(861, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(338, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -327,8 +318,7 @@
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.autoLoadLastsfxCuelistToolStripMenuItem,
-            this.mnuPreloadAll});
+            this.autoLoadLastsfxCuelistToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem.Text = "Settings";
@@ -343,16 +333,6 @@
             this.autoLoadLastsfxCuelistToolStripMenuItem.Text = "Auto load last .sfx cue-list";
             this.autoLoadLastsfxCuelistToolStripMenuItem.Click += new System.EventHandler(this.autoLoadLastsfxCuelistToolStripMenuItem_Click);
             // 
-            // mnuPreloadAll
-            // 
-            this.mnuPreloadAll.Checked = true;
-            this.mnuPreloadAll.CheckOnClick = true;
-            this.mnuPreloadAll.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.mnuPreloadAll.Name = "mnuPreloadAll";
-            this.mnuPreloadAll.Size = new System.Drawing.Size(210, 22);
-            this.mnuPreloadAll.Text = "Pre&load All";
-            this.mnuPreloadAll.Click += new System.EventHandler(this.mnuPreloadAll_Click);
-            // 
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
@@ -364,24 +344,6 @@
             // 
             this.ScrollTimer.Interval = 50;
             this.ScrollTimer.Tick += new System.EventHandler(this.ScrollTimer_Tick);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(288, 6);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(51, 13);
-            this.label1.TabIndex = 24;
-            this.label1.Text = "Playback";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(534, 6);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(115, 13);
-            this.label2.TabIndex = 25;
-            this.label2.Text = "Preview (Headphones)";
             // 
             // bnPrev
             // 
@@ -458,27 +420,111 @@
             this.WebLink.Text = "Remote";
             this.WebLink.Click += new System.EventHandler(this.WebLink_Click);
             // 
-            // Form1
+            // DeviceChangeTimer
+            // 
+            this.DeviceChangeTimer.Interval = 25;
+            this.DeviceChangeTimer.Tick += new System.EventHandler(this.DeviceChangeTimer_Tick);
+            // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
+            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.bnMIDI,
+            this.bnPreview,
+            this.bnPlayback});
+            this.toolStrip1.Location = new System.Drawing.Point(299, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(87, 31);
+            this.toolStrip1.TabIndex = 36;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // bnMIDI
+            // 
+            this.bnMIDI.BackColor = System.Drawing.Color.Red;
+            this.bnMIDI.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bnMIDI.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cbMIDI});
+            this.bnMIDI.Image = ((System.Drawing.Image)(resources.GetObject("bnMIDI.Image")));
+            this.bnMIDI.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bnMIDI.Name = "bnMIDI";
+            this.bnMIDI.ShowDropDownArrow = false;
+            this.bnMIDI.Size = new System.Drawing.Size(28, 28);
+            this.bnMIDI.Text = "toolStripDropDownButton1";
+            this.bnMIDI.ToolTipText = "MIDI Out";
+            // 
+            // cbMIDI
+            // 
+            this.cbMIDI.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbMIDI.DropDownWidth = 221;
+            this.cbMIDI.Name = "cbMIDI";
+            this.cbMIDI.Size = new System.Drawing.Size(121, 23);
+            this.cbMIDI.SelectedIndexChanged += new System.EventHandler(this.cbMIDI_SelectedIndexChanged);
+            // 
+            // bnPreview
+            // 
+            this.bnPreview.BackColor = System.Drawing.Color.Red;
+            this.bnPreview.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bnPreview.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cbPreview});
+            this.bnPreview.Image = ((System.Drawing.Image)(resources.GetObject("bnPreview.Image")));
+            this.bnPreview.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bnPreview.Name = "bnPreview";
+            this.bnPreview.ShowDropDownArrow = false;
+            this.bnPreview.Size = new System.Drawing.Size(28, 28);
+            this.bnPreview.Text = "toolStripDropDownButton2";
+            this.bnPreview.ToolTipText = "Preview Device";
+            // 
+            // cbPreview
+            // 
+            this.cbPreview.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbPreview.DropDownWidth = 221;
+            this.cbPreview.Name = "cbPreview";
+            this.cbPreview.Size = new System.Drawing.Size(121, 23);
+            this.cbPreview.SelectedIndexChanged += new System.EventHandler(this.cbPreview_SelectedIndexChanged);
+            // 
+            // bnPlayback
+            // 
+            this.bnPlayback.BackColor = System.Drawing.Color.Red;
+            this.bnPlayback.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bnPlayback.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cbPlayback});
+            this.bnPlayback.Image = ((System.Drawing.Image)(resources.GetObject("bnPlayback.Image")));
+            this.bnPlayback.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bnPlayback.Name = "bnPlayback";
+            this.bnPlayback.ShowDropDownArrow = false;
+            this.bnPlayback.Size = new System.Drawing.Size(28, 28);
+            this.bnPlayback.Text = "toolStripDropDownButton3";
+            this.bnPlayback.ToolTipText = "Playback Device";
+            // 
+            // cbPlayback
+            // 
+            this.cbPlayback.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbPlayback.DropDownWidth = 221;
+            this.cbPlayback.Name = "cbPlayback";
+            this.cbPlayback.Size = new System.Drawing.Size(121, 23);
+            this.cbPlayback.SelectedIndexChanged += new System.EventHandler(this.cbPlayback_SelectedIndexChanged);
+            // 
+            // SFXPlayer
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(861, 450);
+            this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.rtPrevMainText);
             this.Controls.Add(this.bnNext);
             this.Controls.Add(this.bnPrev);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.bnDeleteCue);
             this.Controls.Add(this.bnAddCue);
             this.Controls.Add(this.bnPlayNext);
             this.Controls.Add(this.bnStopAll);
-            this.Controls.Add(this.cbPreview);
             this.Controls.Add(this.rtMainText);
-            this.Controls.Add(this.cbPlayback);
             this.Controls.Add(this.CueList);
             this.Controls.Add(this.menuStrip1);
             this.DoubleBuffered = true;
@@ -486,7 +532,7 @@
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(875, 482);
-            this.Name = "Form1";
+            this.Name = "SFXPlayer";
             this.RightToLeftLayout = true;
             this.Text = "Form1";
             this.toolTip1.SetToolTip(this, "Playback");
@@ -502,6 +548,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -510,9 +558,7 @@
         #endregion
         private System.Windows.Forms.TableLayoutPanel CueList;
         private System.Windows.Forms.OpenFileDialog dlgOpenAudioFile;
-        private System.Windows.Forms.ComboBox cbPlayback;
         private System.Windows.Forms.RichTextBox rtMainText;
-        private System.Windows.Forms.ComboBox cbPreview;
         private System.Windows.Forms.Button bnStopAll;
         private System.Windows.Forms.Timer ProgressTimer;
         private System.Windows.Forms.Button bnPlayNext;
@@ -525,8 +571,6 @@
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem exportShowFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importShowFileToolStripMenuItem;
@@ -547,10 +591,17 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.ToolStripMenuItem mnuPreloadAll;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel statusBar;
         private System.Windows.Forms.ToolStripStatusLabel WebLink;
+        private System.Windows.Forms.Timer DeviceChangeTimer;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripDropDownButton bnMIDI;
+        private System.Windows.Forms.ToolStripComboBox cbMIDI;
+        private System.Windows.Forms.ToolStripDropDownButton bnPreview;
+        private System.Windows.Forms.ToolStripComboBox cbPreview;
+        private System.Windows.Forms.ToolStripDropDownButton bnPlayback;
+        private System.Windows.Forms.ToolStripComboBox cbPlayback;
     }
 }
 

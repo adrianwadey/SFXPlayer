@@ -19,10 +19,10 @@ namespace SFXPlayer {
             ss.Show();
 #endif  
             Properties.Settings.Default.Upgrade();
-            mainForm = new Form1();
+            mainForm = new SFXPlayer();
             Application.Run(mainForm);
         }
 
-        public static Form1 mainForm;
+        public static SFXPlayer mainForm;
     }
 }

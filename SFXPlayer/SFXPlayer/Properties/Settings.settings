@@ -12,7 +12,7 @@
       <Value Profile="(Default)">Gold</Value>
     </Setting>
     <Setting Name="ColourPlayerPlay" Type="System.Drawing.Color" Scope="User">
-      <Value Profile="(Default)">PaleGreen</Value>
+      <Value Profile="(Default)">0, 192, 0</Value>
     </Setting>
     <Setting Name="ColourPlayerPaused" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">LightGreen</Value>
@@ -43,9 +43,6 @@
     </Setting>
     <Setting Name="LastPlaybackDevice" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="PreloadAll" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="LastMidiDevice" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
