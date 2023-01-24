@@ -17,6 +17,7 @@ namespace SFXPlayer {
             SplashScreen ss = new SplashScreen();
 #if !DEBUG
             ss.Show();
+            ss.Refresh();
 #endif  
             Properties.Settings.Default.Upgrade();
             mainForm = new SFXPlayer();
