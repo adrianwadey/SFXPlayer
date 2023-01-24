@@ -18,7 +18,7 @@ Includes MIDI output to trigger lighting changes during music playback or Pyros 
 
 ### Build from source
 
-If building from source you will need the NAudio nugget
+If building from source you will need the NAudio nugget (among others)
 
 ```
 project -> Manage Nugets -> restore from online sources
