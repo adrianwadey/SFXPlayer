@@ -12,12 +12,13 @@ Latest release 2.0.0.5
 
 ![Screenshot](SFXPlayer/SFXPlayer/SFXPlayer.PNG)
 
-Includes MIDI output to trigger lighting changes during music playback or Pyros during spells - or use your imagination.
-![Screenshot](SFXPlayer/SFXPlayer/TimeStamper.PNG)
+Includes MIDI output to trigger lighting changes during music playback or Pyros during spells or - use your imagination.
+
+![Screenshot](SFXPlayer/SFXPlayer/TimeStamper.png)
 
 ### Build from source
 
-If building from source you will need the cscore nugget
+If building from source you will need the NAudio nugget
 
 ```
 project -> Manage Nugets -> restore from online sources
@@ -48,7 +49,7 @@ audio device for the main output)
 
 ## To do:
 
-Icons for pause, file/loaded file, volume.
+~~Icons for pause, file/loaded file, volume.~~
 
 The drawing of the progress bar behind the PlayStrip causes the PlayStrip to flicker.
 
@@ -59,4 +60,4 @@ I had to catch the mousewheel and trigger a timer,
 allow the system to scroll the panel and then in the timer event reset the scroll to whole control 
 units. Would like a better way to do this.
 
-Should pre-loading be automatic and if so how many files should it pre-load and when should the pre-load trigger?
+~~Should pre-loading be automatic and if so how many files should it pre-load and when should the pre-load trigger?~~ Pre-loading is automatic
