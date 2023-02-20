@@ -12,7 +12,7 @@ namespace SFXPlayer
     {
         public override string ToString()
         {
-            return  new TimeSpan(TimeTicks).ToString(@"mm\:ss\.ff") + "\t" + Description;
+            return  new TimeSpan(TimeTicks).ToString(@"mm\:ss\.ff") + "\t" + Description + "\t" + showEvent.ToString();
         }
 
         internal void Edit()

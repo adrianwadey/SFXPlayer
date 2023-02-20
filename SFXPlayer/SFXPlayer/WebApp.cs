@@ -8,6 +8,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Xml;
 
 namespace SFXPlayer
@@ -22,6 +23,7 @@ namespace SFXPlayer
         public static void Start()
         {
             if (Listener != null) return;
+            if (!CheckIfPermitted()) return;
             try {
                 Listener = new HttpListener();
                 Listener.Prefixes.Add(Prefix + wsPort.ToString() + "/");
@@ -31,6 +33,47 @@ namespace SFXPlayer
             } catch (Exception) {
                 Listener = null;
             }
+        }
+
+        private static bool CheckIfPermitted() {
+            var process = new Process {
+                StartInfo =
+                    {
+                        FileName = "netsh",
+                        Arguments = "http show urlacl url=" + Prefix + wsPort.ToString() + "/",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true
+                    }
+            };
+            process.Start();
+            var output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            Debug.WriteLine(output);
+
+            //parse the output
+            if (output.Contains("User: NT AUTHORITY\\Authenticated Users")) return true;
+
+            if (MessageBox.Show("Do you wish to enable the web server for the Remote Control?", Application.ProductName, MessageBoxButtons.YesNo) != DialogResult.Yes) return false;
+
+            //add our url to the ACL list
+            try {
+                process = new Process {
+                    StartInfo =
+                        {
+                        FileName = "netsh",
+                        Arguments = "http add urlacl url=" + Prefix + wsPort.ToString() + "/" + " user=\"NT AUTHORITY\\Authenticated Users\"",
+                        UseShellExecute = true,
+                        Verb = "runas"
+                    }
+                };
+                process.Start();
+            } catch (Exception e) {
+                MessageBox.Show("Unable to start web server for remote app.\r\n" + e.Message);
+                return false;
+            }
+            process.WaitForExit();
+            Debug.WriteLine(output);
+            return true;
         }
 
         public static async void StopAsync() {

@@ -92,7 +92,7 @@ namespace SFXPlayer {
             //get a list of the sound files
             List<string> archCues = new List<string>();
             foreach (SFX cue in Cues) {
-                archCues.Add(cue.FileName);
+                archCues.Add(cue.FilePath);
             }
             archCues = archCues.Distinct().ToList();    //only need one copy of each file
             foreach (string audioFileName in archCues) {
@@ -107,7 +107,7 @@ namespace SFXPlayer {
             XMLFileHandler<Show>.UntrackedSave(this, Path.Combine(tempDirectory, Path.GetFileName(CurrentFileName)));
             Show tempShow = XMLFileHandler<Show>.Load(Path.Combine(tempDirectory, Path.GetFileName(CurrentFileName)));
             foreach (SFX cue in tempShow.Cues) {
-                cue.FileName = Path.GetFileName(cue.FileName);      //remove the path
+                cue.FilePath = Path.GetFileName(cue.FilePath);      //remove the path
             }
             XMLFileHandler<Show>.UntrackedSave(tempShow, Path.Combine(tempDirectory, Path.GetFileName(CurrentFileName)));
 

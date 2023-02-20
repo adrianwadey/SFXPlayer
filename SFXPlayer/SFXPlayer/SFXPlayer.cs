@@ -27,7 +27,7 @@ namespace SFXPlayer
         const int TOPPLACEHOLDER = -1;
         const int BOTTOMPLACEHOLDER = -2;
         const string FileExtensions = "SFX Cue Files (*.sfx)|*.sfx";
-        private bool InitialisingDevices = false;
+        private bool InitialisingDevices;
         private XMLFileHandler<Show> ShowFileHandler = new XMLFileHandler<Show>();
         private const int WM_DEVICECHANGE = 0x0219;
 
@@ -80,7 +80,6 @@ namespace SFXPlayer
         private readonly ObservableCollection<string> PreviewDevices = new ObservableCollection<string>();
         private MMDeviceEnumerator deviceEnum = new MMDeviceEnumerator();
         public static Control lastFocused;
-        string[] filters;
 
         public SFXPlayer()
         {
@@ -243,7 +242,6 @@ namespace SFXPlayer
             bnPlayback.Image = FromSvgResource("volume-up-fill.svg");
             UpdateDevices();
 
-            ProgressTimer.Enabled = true;
             string[] args = Environment.GetCommandLineArgs();
             foreach (string cmd in args)
             {
@@ -268,6 +266,9 @@ namespace SFXPlayer
                 newShow = ShowFileHandler.LoadFromFile(StartFile);
                 if (newShow != null)
                 {
+                    foreach (SFX SFX in newShow.Cues) {
+                        SFX.Triggers = new BindingList<Trigger>(SFX.Triggers.OrderBy(t => t.TimeTicks).ToList());
+                    }
                     int tempNextPlayCueIndex = newShow.NextPlayCueIndex;
                     CurrentShow = newShow;
                     NextPlayCueIndex = tempNextPlayCueIndex;
@@ -302,6 +303,7 @@ namespace SFXPlayer
             //WaveOut gives us truncated names but the index we need to open the device
             //combine these with the full names from mmdevices to populate the device list
             //add/remove devices so that we don't reset the list
+            InitialisingDevices = true;
 
             AudioOutDevices.Clear();
             {   //fill in AudioOutDevices
@@ -454,12 +456,16 @@ namespace SFXPlayer
         {
             Debug.WriteLine("MouseWheelScrollLines = " + SystemInformation.MouseWheelScrollLines);
             WebApp.Start();
-            string localIP;
+            string localIP = "127.0.0.1";
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
             {
-                socket.Connect("8.8.8.8", 65530);
-                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
-                localIP = endPoint.Address.ToString();
+                try {
+                    socket.Connect("8.8.8.8", 65530);
+                    IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
+                    localIP = endPoint.Address.ToString();
+                } catch (Exception e) {
+                    Debug.WriteLine(e.Message);
+                }
             }
 
             if (WebApp.Serving)
@@ -619,6 +625,10 @@ namespace SFXPlayer
             if (CurrentShow != null)
             {
                 int tempNextPlayCueIndex = CurrentShow.NextPlayCueIndex;
+                //ensure cues are in time order
+                foreach (SFX SFX in CurrentShow.Cues) {
+                    SFX.Triggers = new BindingList<Trigger>(SFX.Triggers.OrderBy(t=>t.TimeTicks).ToList());
+                }
                 CurrentShow.UpdateShow += UpdateDisplay;
                 ResetDisplay();
                 NextPlayCueIndex = tempNextPlayCueIndex;
@@ -860,20 +870,6 @@ namespace SFXPlayer
         {
             StopAll(sender, e);
             StopPreviews(sender, e);
-        }
-
-        private void ProgressTimer_Tick(object sender, EventArgs e)
-        {
-            foreach (Control ctl in CueList.Controls)
-            {
-                if (ctl.GetType() == typeof(PlayStrip))
-                {
-                    if (((PlayStrip)ctl).IsPlaying)
-                    {
-                        ((PlayStrip)ctl).ProgressUpdate(sender, e);
-                    }
-                }
-            }
         }
 
         private void bnPlayNext_Click(object sender, EventArgs e)
@@ -1131,25 +1127,25 @@ namespace SFXPlayer
 
         private bool CheckAllFilesAreAudio(string[] files)
         {
-            bool FileOK;
-            foreach (string file in files)
-            {
-                FileOK = false;
-                Console.WriteLine(file);
-                foreach (string filter in filters)
-                {
-                    if (Path.GetExtension(file).ToUpper() == filter)
-                    {
-                        FileOK = true;
-                        break;
-                    }
-                }
-                if (!FileOK)
-                {
-                    //Debug.WriteLine("Not all files are audio");
-                    return false;
-                }
-            }
+            //bool FileOK;
+            //foreach (string file in files)
+            //{
+            //    FileOK = false;
+            //    Console.WriteLine(file);
+            //    foreach (string filter in filters)
+            //    {
+            //        if (Path.GetExtension(file).ToUpper() == filter)
+            //        {
+            //            FileOK = true;
+            //            break;
+            //        }
+            //    }
+            //    if (!FileOK)
+            //    {
+            //        //Debug.WriteLine("Not all files are audio");
+            //        return false;
+            //    }
+            //}
             //Debug.WriteLine("All files are audio");
             return true;
         }
@@ -1306,11 +1302,11 @@ namespace SFXPlayer
                 {
                     //we're over a PlayStrip and there's only one file
                     string msg = "do you wish to replace the file" + Environment.NewLine;
-                    msg += ps.SFX.ShortFileNameOnly + Environment.NewLine;
+                    msg += ps.SFX.FileNameOnly + Environment.NewLine;
                     msg += "with" + Environment.NewLine;
                     msg += Path.GetFileName(files[0]) + Environment.NewLine;
                     msg += "in cue " + (ps.PlayStripIndex + 1).ToString("D3") + "?" + Environment.NewLine;
-                    if (string.IsNullOrEmpty(ps.SFX.FileName) ||
+                    if (string.IsNullOrEmpty(ps.SFX.FilePath) ||
                         MessageBox.Show(msg, "Replace File", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
                     {
                         Debug.WriteLine("replacing file at index {0}", ps.PlayStripIndex);
@@ -1412,9 +1408,12 @@ namespace SFXPlayer
 
         private void helpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("It is recommended to disable system sounds\r\n" +
-                            "right click on the windows speaker icon and choose \"Sounds\"\r\n" +
-                            "then choose Sound Scheme: No Sounds", Application.ProductName);
+            if (MessageBox.Show("It is recommended to disable system sounds.\r\n" +
+                            "To change system sounds press OK.\r\n" +
+                            "Choose Sound Scheme: No Sounds.", Application.ProductName, MessageBoxButtons.OKCancel) == DialogResult.OK)
+            {
+                Process.Start("mmsys.cpl", ",2");
+            }
         }
 
         private void autoLoadLastsfxCuelistToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1518,7 +1517,7 @@ namespace SFXPlayer
                 Title = Text,
                 PrevMainText = rtPrevMainText.Text,
                 MainText = rtMainText.Text,
-                TrackName = Path.GetFileName(NextPlayCue?.SFX.FileName)
+                TrackName = Path.GetFileName(NextPlayCue?.SFX.FilePath)
             };
             OnDisplayChanged(disp);
         }

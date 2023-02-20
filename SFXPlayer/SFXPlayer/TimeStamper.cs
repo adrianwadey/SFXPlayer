@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,17 +42,20 @@ namespace SFXPlayer
                 myRendererSettings.Width = Screen.AllScreens.Select(s => s.Bounds.Width).Max();
                 myRendererSettings.BottomHeight = myRendererSettings.TopHeight = (pictureBox1.Height - pictureBox1.Padding.Vertical) / 2 - 2;
                 var renderer = new WaveFormRenderer();
-                using (var waveStream = new AudioFileReader(SFX.FileName))
-                {
-                    WaveLength = waveStream.TotalTime;
-                    Length.Text = WaveLength.ToString(@"mm\:ss\.ff");
-                    pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
-                    pictureBox1.BackgroundImage = renderer.Render(waveStream, maxPeakProvider, myRendererSettings);
-                    bm = new Bitmap(pictureBox1.BackgroundImage.Width, pictureBox1.BackgroundImage.Height);
-                    pictureBox1.Image = bm;
+                if (File.Exists(SFX.FilePath)) {
+                    using (var waveStream = new AudioFileReader(SFX.FilePath)) {
+                        WaveLength = waveStream.TotalTime;
+                        Length.Text = WaveLength.ToString(@"mm\:ss\.ff");
+                        pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
+                        pictureBox1.BackgroundImage = renderer.Render(waveStream, maxPeakProvider, myRendererSettings);
+                        bm = new Bitmap(pictureBox1.BackgroundImage.Width, pictureBox1.BackgroundImage.Height);
+                        pictureBox1.Image = bm;
+                    }
+                } else {
+                    trackBar1.Enabled = false;
                 }
             }
-            catch (Exception)
+            catch (Exception k)
             {
                 MessageBox.Show("Something went wrong");
                 this.Close();
@@ -171,6 +175,8 @@ namespace SFXPlayer
         {
             if (listBox1.SelectedItems.Count == 0) return;
             ((Trigger)listBox1.SelectedItem).Edit();
+            listBox1.DataSource = null;
+            listBox1.DataSource = SFX.Triggers;
         }
 
         private void trackBar1_Scroll(object sender, EventArgs e)

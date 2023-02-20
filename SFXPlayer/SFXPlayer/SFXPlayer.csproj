@@ -156,6 +156,7 @@
   <ItemGroup>
     <Compile Include="Extensions.cs" />
     <Compile Include="FileHandler.cs" />
+    <Compile Include="OSC.cs" />
     <Compile Include="SFXPlayer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -200,6 +201,12 @@
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </Compile>
     <Compile Include="SVGResources.cs" />
+    <Compile Include="EventEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EventEditor.Designer.cs">
+      <DependentUpon>EventEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="TimeStamper.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -221,6 +228,13 @@
     </Compile>
     <Compile Include="WAVSounds.cs" />
     <Compile Include="WebApp.cs" />
+    <Compile Include="X32MuteEvent.cs" />
+    <Compile Include="X32MuteEventEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="X32MuteEventEditor.Designer.cs">
+      <DependentUpon>X32MuteEventEditor.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="SFXPlayer.resx">
       <DependentUpon>SFXPlayer.cs</DependentUpon>
     </EmbeddedResource>
@@ -242,6 +256,9 @@
     <EmbeddedResource Include="SplashScreen.resx">
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EventEditor.resx">
+      <DependentUpon>EventEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TimeStamper.resx">
       <DependentUpon>TimeStamper.cs</DependentUpon>
     </EmbeddedResource>
@@ -251,6 +268,9 @@
     <EmbeddedResource Include="ucVolume.resx">
       <DependentUpon>ucVolume.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="X32MuteEventEditor.resx">
+      <DependentUpon>X32MuteEventEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="..\..\LICENSE.md">
       <Link>LICENSE.md</Link>
     </None>
@@ -259,6 +279,7 @@
     </None>
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
+    <None Include="Properties\DataSources\MIDI.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -34,7 +34,6 @@
             this.dlgOpenAudioFile = new System.Windows.Forms.OpenFileDialog();
             this.rtMainText = new System.Windows.Forms.RichTextBox();
             this.bnStopAll = new System.Windows.Forms.Button();
-            this.ProgressTimer = new System.Windows.Forms.Timer(this.components);
             this.bnPlayNext = new System.Windows.Forms.Button();
             this.bnAddCue = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
@@ -132,10 +131,6 @@
             this.bnStopAll.UseVisualStyleBackColor = false;
             this.bnStopAll.Click += new System.EventHandler(this.bnStopAll_Click);
             // 
-            // ProgressTimer
-            // 
-            this.ProgressTimer.Tick += new System.EventHandler(this.ProgressTimer_Tick);
-            // 
             // bnPlayNext
             // 
             this.bnPlayNext.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
@@ -182,7 +177,7 @@
             this.menuStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(338, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(218, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -435,9 +430,9 @@
             this.bnMIDI,
             this.bnPreview,
             this.bnPlayback});
-            this.toolStrip1.Location = new System.Drawing.Point(299, 0);
+            this.toolStrip1.Location = new System.Drawing.Point(268, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(87, 31);
+            this.toolStrip1.Size = new System.Drawing.Size(118, 31);
             this.toolStrip1.TabIndex = 36;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -560,7 +555,6 @@
         private System.Windows.Forms.OpenFileDialog dlgOpenAudioFile;
         private System.Windows.Forms.RichTextBox rtMainText;
         private System.Windows.Forms.Button bnStopAll;
-        private System.Windows.Forms.Timer ProgressTimer;
         private System.Windows.Forms.Button bnPlayNext;
         private System.Windows.Forms.Button bnAddCue;
         private System.Windows.Forms.ToolTip toolTip1;

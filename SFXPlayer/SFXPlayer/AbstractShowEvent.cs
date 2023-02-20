@@ -13,5 +13,6 @@ namespace SFXPlayer
         public abstract void Execute();
         public abstract void Edit();
 
+        public abstract event EventHandler ShowEventChanged;
     }
 }
